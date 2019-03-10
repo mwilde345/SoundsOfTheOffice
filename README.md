@@ -1,10 +1,5 @@
-Regions: [🇯🇵](../../tree/ja-JP)
 
-
-
-#  Build An Alexa Trivia Skill 🇺🇸
-<img src="https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/fact/header._TTH_.png" />
-
+Object Schema: https://developer.amazon.com/docs/smapi/ask-cli-intro.html#object-schemas
 
 
 This Alexa sample skill is a template for a basic trivia skill. Provided a list of interesting questions about a topic, Alexa will select a question at random and ask it of the user when the skill is invoked.

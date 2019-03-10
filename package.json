@@ -1,0 +1,24 @@
+{
+  "name": "soundsoftheoffice",
+  "version": "1.0.0",
+  "description": "Object Schema: https://developer.amazon.com/docs/smapi/ask-cli-intro.html#object-schemas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mwilde345/SoundsOfTheOffice.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mwilde345/SoundsOfTheOffice/issues"
+  },
+  "homepage": "https://github.com/mwilde345/SoundsOfTheOffice#readme",
+  "devDependencies": {
+    "eslint": "^5.15.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0"
+  }
+}
