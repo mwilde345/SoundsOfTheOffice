@@ -20,5 +20,9 @@
     "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.418.0",
+    "ssml-builder": "^0.4.3"
   }
 }

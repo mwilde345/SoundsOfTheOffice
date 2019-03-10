@@ -1,5 +1,6 @@
 const Constants = require('../common/constants');
 const WelcomeHelpers = require('../helpers/welcomeHelpers');
+// open skill
 
 console.log(Constants);
 console.log(WelcomeHelpers);
