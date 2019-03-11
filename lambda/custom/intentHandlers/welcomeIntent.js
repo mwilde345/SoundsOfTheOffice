@@ -2,9 +2,6 @@ const Constants = require('../common/constants');
 const WelcomeHelpers = require('../helpers/welcomeHelpers');
 // open skill
 
-console.log(Constants);
-console.log(WelcomeHelpers);
-
 const WelcomeIntent = {
   canHandle(handlerInput) {
     const { request } = handlerInput.requestEnvelope;
@@ -12,8 +9,20 @@ const WelcomeIntent = {
     return request.type === 'IntentRequest' && request.intent.name === 'WelcomeIntent';
   },
   handle(handlerInput) {
+    const deviceID = handlerInput.context.System.device.deviceId;
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    console.log(sessionAttributes);
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const clipsAndCache = WelcomeHelpers.getCacheAndClips(deviceID);
+
+    Object.assign(sessionAttributes, clipsAndCache);
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+
+    const speechOutput = requestAttributes.t('WELCOME_MESSAGE');
+    return handlerInput.attributesManager
+      .speak(speechOutput)
+      .reprompt(speechOutput)
+      .getResponse();
   },
 };
 

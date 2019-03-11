@@ -1,8 +1,11 @@
 /* eslint-disable  func-names */
 /* eslint-disable  no-console */
+const i18n = require('i18next');
+const sprintf = require('i18next-sprintf-postprocessor');
 const Alexa = require('ask-sdk-core');
 // const Speech = require('ssml-builder');
 const AWS = require('aws-sdk');
+const Constants = require('./common/constants');
 
 const credentials = new AWS.SharedIniFileCredentials({
   profile: 'mwildeadmin',
@@ -48,6 +51,22 @@ const ErrorHandler = {
   },
 };
 
+const LocalizationInterceptor = {
+  process(handlerInput) {
+    const localizationClient = i18n.use(sprintf).init({
+      lng: handlerInput.requestEnvelope.request.locale,
+      overloadTranslationOptionHandler: sprintf.overloadTranslationOptionHandler,
+      resources: Constants.LANGUAGE_STRING,
+      returnObjects: true,
+    });
+
+    const attributes = handlerInput.attributesManager.getRequestAttributes();
+    attributes.t = function (...args) {
+      return localizationClient.t(...args);
+    };
+  },
+};
+
 const skillBuilder = Alexa.SkillBuilders.custom();
 exports.handler = skillBuilder
   .addRequestHandlers(
@@ -69,6 +88,6 @@ exports.handler = skillBuilder
     ExitIntent,
     GameIntent,
   )
-  .addRequestInterceptors(null)
+  .addRequestInterceptors(LocalizationInterceptor)
   .addErrorHandlers(ErrorHandler)
   .lambda();

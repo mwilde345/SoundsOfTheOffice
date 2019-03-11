@@ -16,6 +16,12 @@ const SingleQuoteIntent = {
   },
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    // buildClips(sessionAttributes, () => {
+    //   const fileURL = getRandomQuote(sessionAttributes);
+    //   speech.audio(fileURL);
+    //   that.emit(':tell', speech.ssml(true));
+    //   speech = new AmazonSpeech();
+    // });
     console.log(sessionAttributes);
   },
 };
