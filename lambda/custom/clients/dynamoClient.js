@@ -1,14 +1,17 @@
 // get playedClips for the currentDevice onLoad
 // get clips from quotes table, including character name
-let AWS; let Dynamo;
+const globalClient = require('aws-sdk');
+const Constants = require('../common/constants');
 
-function getCache(deviceID) {
+let Dynamo;
+
+function getCache(userID) {
   const params = {
     ExpressionAttributeValues: {
-      ':d': deviceID,
+      ':u': userID,
     },
-    KeyConditionExpression: 'deviceID = :d',
-    ProjectionExpression: 'deviceID, clipsPlayed',
+    KeyConditionExpression: 'userID = :u',
+    ProjectionExpression: 'clipsPlayed',
     TableName: 'quote_cache',
   };
   return new Promise((resolve, reject) => {
@@ -22,15 +25,20 @@ function getCache(deviceID) {
   });
 }
 
-function getClipData(bucketName) {
+function getClipData(isPaid) {
+  const keyExpression = isPaid ? 'begins_with(s3bucket, :b)'
+    : 's3bucket = :b';
+  const bucketFilter = isPaid ? Constants.BUCKET_NAME_BASE : Constants.BUCKET_NAME_FREE;
   const params = {
     ExpressionAttributeValues: {
-      ':b': bucketName,
+      ':b': bucketFilter,
+      ':p': 'default',
     },
-    KeyConditionExpression: 's3bucket = :b',
-    ProjectionExpression: 'clipID, character',
-    TableName: 'quote_clips',
+    KeyConditionExpression: `PK = :p and ${keyExpression}`,
+    ProjectionExpression: 'clipID, characterName, s3bucket',
+    TableName: 'quote_list',
   };
+  console.log(`dynamo params${JSON.stringify(params)}`);
   return new Promise((resolve, reject) => {
     Dynamo.query(params, (err, data) => {
       if (err) {
@@ -44,14 +52,15 @@ function getClipData(bucketName) {
 
 // while playing clips, keep updating the response from getCache
 //  in the SA. then push the updated object here
-function updateCache(input) {
+function updateCache(userID, cache) {
   const params = {
     Item: {
-      deviceID: input.deviceID,
-      clipsPlayed: input.clipsPlayed,
+      userID,
+      clipsPlayed: cache,
     },
     TableName: 'quote_cache',
   };
+  console.log('updating cache');
   return new Promise((resolve, reject) => {
     Dynamo.put(params, (err, data) => {
       if (err) {
@@ -64,14 +73,22 @@ function updateCache(input) {
 }
 
 function init(awsClient) {
-  AWS = awsClient;
-  Dynamo = new AWS.DynamoDB.DocumentClient();
+  const localClient = awsClient || globalClient;
+  // const credentials = new localClient.SharedIniFileCredentials({
+  //   profile: 'mwildeadmin',
+  // });
+  // localClient.config.credentials = credentials;
+  // localClient.config.update({ region: 'us-east-1' });
+  Dynamo = new localClient.DynamoDB.DocumentClient();
   return {
     getCache,
     getClipData,
     updateCache,
   };
 }
+
+init();
+getClipData(true);
 
 module.exports = {
   init,

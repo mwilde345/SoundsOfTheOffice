@@ -1,70 +1,157 @@
 {
   "interactionModel": {
-    "languageModel": {
-      "invocationName": "sounds of the office",
-      "intents": [
-        {
-          "name": "AMAZON.CancelIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.HelpIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.StopIntent",
-          "samples": []
-        },
-        {
-          "name": "AnswerIntent",
-          "samples": [
-            "the answer is {Answer}",
-            "my answer is {Answer}",
-            "is it {Answer}",
-            "{Answer} is my answer",
-            "{Answer}"
+      "languageModel": {
+          "invocationName": "sounds of the office",
+          "intents": [
+              {
+                  "name": "AMAZON.CancelIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.HelpIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.StopIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AnswerIntent",
+                  "slots": [
+                      {
+                          "name": "characterName",
+                          "type": "CHARACTER"
+                      }
+                  ],
+                  "samples": [
+                      "the answer is {characterName}",
+                      "my answer is {characterName}",
+                      "is it {characterName}",
+                      "{characterName} is my answer",
+                      "that was {characterName}",
+                      "{characterName}"
+                  ]
+              },
+              {
+                  "name": "DontKnowIntent",
+                  "slots": [],
+                  "samples": [
+                      "i don't know",
+                      "don't know",
+                      "i don't know that one",
+                      "dunno",
+                      "skip",
+                      "i don't know that",
+                      "who knows",
+                      "i don't know this question"
+                  ]
+              },
+              {
+                  "name": "AMAZON.StartOverIntent",
+                  "samples": [
+                      "start over"
+                  ]
+              },
+              {
+                "name": "GameIntent",
+                "samples": [
+                  "new game",
+                  "play game",
+                  "start a game",
+                  "i want to play a game"
+                ]
+              },
+              {
+                "name": "MenuIntent",
+                "samples": [
+                  "main menu",
+                  "go back",
+                  "menu",
+                  "go to the menu"
+                ]
+              },
+              {
+                  "name": "AMAZON.RepeatIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.YesIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.NoIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.NavigateHomeIntent",
+                  "samples": []
+              },
+              {
+                  "name": "SingleQuoteIntent",
+                  "slots": [
+                      {
+                          "name": "characterName",
+                          "type": "CHARACTER"
+                      }
+                  ],
+                  "samples": [
+                      "play a quote by {characterName}",
+                      "get a quote from {characterName}",
+                      "get a quote",
+                      "play a quote",
+                      "get me a quote",
+                      "quote from {characterName}"
+                  ]
+              },
+              {
+                "name": "PurchaseIntent",
+                "samples": [
+                    "get bonus quotes",
+                    "unlock extra quotes",
+                    "bonus quotes",
+                    "buy",
+                    "purchase",
+                    "download more quotes"
+                ]
+              },
+              {
+                "name": "MultiQuoteIntent",
+                "slots": [
+                    {
+                        "name": "characterName",
+                        "type": "CHARACTER"
+                    }
+                ],
+                "samples": [
+                    "play a few quotes by {characterName}",
+                    "get quotes from  {characterName}",
+                    "get a few quotes",
+                    "play some quotes",
+                    "hear some quotes",
+                    "quotes",
+                    "get me some quotes",
+                    "more quotes",
+                    "more",
+                    "few quotes from {characterName}"
+                ]
+              }
           ],
-          "slots": [
-            {
-              "name": "Answer",
-              "type": "AMAZON.NUMBER",
-              "samples": []
-            }
+          "types": [
+              {
+                  "name": "CHARACTER",
+                  "values": [
+                      {
+                          "name": {
+                              "value": "dwight",
+                              "synonyms": [
+                                  "schrute",
+                                  "dwight schrute"
+                              ]
+                          }
+                      }
+                  ]
+              }
           ]
-        },
-        {
-          "name": "DontKnowIntent",
-          "samples": [
-            "i don't know",
-            "don't know",
-            "i don't know that one",
-            "dunno",
-            "skip",
-            "i don't know that",
-            "who knows",
-            "i don't know this question"
-          ],
-          "slots": []
-        },
-        {
-          "name": "AMAZON.StartOverIntent",
-          "samples": [
-            "start game",
-            "new game",
-            "start",
-            "start new game"
-          ]
-        },
-        {
-          "name": "AMAZON.RepeatIntent"
-        },
-        {
-          "name": "AMAZON.YesIntent"
-        },
-        {
-          "name": "AMAZON.NoIntent"
-        }
-      ]
-    }
+      }
   }
 }

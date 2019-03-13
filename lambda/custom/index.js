@@ -3,17 +3,9 @@
 const i18n = require('i18next');
 const sprintf = require('i18next-sprintf-postprocessor');
 const Alexa = require('ask-sdk-core');
-// const Speech = require('ssml-builder');
 const AWS = require('aws-sdk');
+const AmazonSpeech = require('ssml-builder/amazon_speech');
 const Constants = require('./common/constants');
-
-const credentials = new AWS.SharedIniFileCredentials({
-  profile: 'mwildeadmin',
-});
-AWS.config.credentials = credentials;
-AWS.config.region = 'us-east-2';
-// const AmazonSpeech = require('ssml-builder/amazon_speech');
-// var speech = new AmazonSpeech();
 
 const {
   LaunchRequest,
@@ -67,7 +59,16 @@ const LocalizationInterceptor = {
   },
 };
 
+const InitializationInterceptor = {
+  process(handlerInput) {
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    handlerInput.attributesManager
+      .setRequestAttributes(Object.assign(requestAttributes, { speech: new AmazonSpeech() }));
+  },
+};
+
 const skillBuilder = Alexa.SkillBuilders.custom();
+// register the unhandledIntent last.
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequest,
@@ -79,7 +80,6 @@ exports.handler = skillBuilder
     CancelIntent,
     NoIntent,
     SessionEndedRequest,
-    UnhandledIntent,
     SingleQuoteIntent,
     MultiQuoteIntent,
     PurchaseIntent,
@@ -87,7 +87,8 @@ exports.handler = skillBuilder
     WelcomeIntent,
     ExitIntent,
     GameIntent,
+    UnhandledIntent,
   )
-  .addRequestInterceptors(LocalizationInterceptor)
+  .addRequestInterceptors(LocalizationInterceptor, InitializationInterceptor)
   .addErrorHandlers(ErrorHandler)
   .lambda();

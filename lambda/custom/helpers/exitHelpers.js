@@ -1,7 +1,11 @@
+const AWS = require('aws-sdk');
 const Constants = require('../common/constants');
+const DynamoClient = require('../clients/dynamoClient').init(AWS);
 
-const dummy = () => { console.log(Constants.ANSWER_COUNT); };
+function updateCache(userID, cache) {
+  DynamoClient.updateCache(userID, cache);
+}
 
 module.exports = {
-  dummy,
+  updateCache,
 };

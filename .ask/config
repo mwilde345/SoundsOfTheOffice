@@ -1,16 +1,16 @@
 {
   "deploy_settings": {
     "default": {
-      "skill_id": "amzn1.ask.skill.1c7b2fcc-19dd-4209-be36-8acddf9a7fca",
+      "skill_id": "amzn1.ask.skill.86a17c42-5ce7-40e4-a1d5-73b94733f355",
       "was_cloned": false,
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "0cc0c9a5a85675c73b104f30be1209b4"
+          "eTag": "d66c9d45b3600f7f6f883334fc6573f5"
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "1fde6710c75a80e317ed477c9e630e3e"
+            "eTag": "52deba14f1bda2cfa77a72f9019690ee"
           }
         },
         "lambda": [
@@ -18,12 +18,12 @@
             "alexaUsage": [
               "custom/default"
             ],
-            "arn": "arn:aws:lambda:us-east-2:574024764028:function:ask-custom-sounds-of-the-office-default",
-            "awsRegion": "us-east-2",
+            "arn": "arn:aws:lambda:us-east-1:574024764028:function:ask-custom-sounds-of-the-office-default",
+            "awsRegion": "us-east-1",
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-sounds-of-the-office-default",
             "handler": "index.handler",
-            "revisionId": "b0a5f3a8-59de-48a1-8fb5-5659ed31a55f",
+            "revisionId": "70099e27-f589-4582-8006-de5df3379e26",
             "runtime": "nodejs8.10"
           }
         ]

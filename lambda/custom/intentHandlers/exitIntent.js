@@ -12,7 +12,12 @@ const ExitIntent = {
   },
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    console.log(sessionAttributes);
+    const userID = handlerInput.requestEnvelope.context.System.user.userId;
+    const { cache } = sessionAttributes;
+    ExitHelpers.updateCache(userID, cache);
+    return handlerInput.responseBuilder
+      .speak(Constants.EXIT_MESSAGE)
+      .withShouldEndSession(true);
   },
 };
 

@@ -1,5 +1,9 @@
 
 Object Schema: https://developer.amazon.com/docs/smapi/ask-cli-intro.html#object-schemas
+Handler input: https://ask-sdk-for-nodejs.readthedocs.io/en/latest/Processing-Request.html#handler-input
+
+aws lambda get-function --function-name <arn>
+to get the latest revisionId of lambda to put in the ask config. useful if updating lambda from console.
 
 
 This Alexa sample skill is a template for a basic trivia skill. Provided a list of interesting questions about a topic, Alexa will select a question at random and ask it of the user when the skill is invoked.

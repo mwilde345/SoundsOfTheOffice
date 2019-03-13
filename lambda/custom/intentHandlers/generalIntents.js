@@ -1,5 +1,7 @@
 const GeneralHelpers = require('../helpers/generalHelpers');
 const Constants = require('../common/constants');
+const { WelcomeIntent } = require('./welcomeIntent');
+const { ExitIntent } = require('./exitIntent');
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -10,7 +12,7 @@ const LaunchRequest = {
           && request.intent.name === 'AMAZON.StartOverIntent');
   },
   handle(handlerInput) {
-    return GeneralHelpers.startGame(true, handlerInput);
+    return WelcomeIntent.handle(handlerInput);
   },
 };
 
@@ -38,30 +40,19 @@ const UnhandledIntent = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     if (Object.keys(sessionAttributes).length === 0) {
       const speechOutput = requestAttributes.t('START_UNHANDLED');
-      return handlerInput.attributesManager
+      return handlerInput.responseBuilder
         .speak(speechOutput)
         .reprompt(speechOutput)
         .getResponse();
     } if (sessionAttributes.questions) {
       const speechOutput = requestAttributes.t('TRIVIA_UNHANDLED', Constants.ANSWER_COUNT.toString());
-      return handlerInput.attributesManager
+      return handlerInput.responseBuilder
         .speak(speechOutput)
         .reprompt(speechOutput)
         .getResponse();
     }
     const speechOutput = requestAttributes.t('HELP_UNHANDLED');
-    return handlerInput.attributesManager.speak(speechOutput).reprompt(speechOutput).getResponse();
-  },
-};
-
-const SessionEndedRequest = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
-  },
-  handle(handlerInput) {
-    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
-
-    return handlerInput.responseBuilder.getResponse();
+    return handlerInput.responseBuilder.speak(speechOutput).reprompt(speechOutput).getResponse();
   },
 };
 
@@ -108,7 +99,7 @@ const YesIntent = {
   },
 };
 
-
+// store current state of trivia in session attributes in case of YesIntent
 const StopIntent = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -117,13 +108,14 @@ const StopIntent = {
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const speechOutput = requestAttributes.t('STOP_MESSAGE');
-
-    return handlerInput.responseBuilder.speak(speechOutput)
-      .reprompt(speechOutput)
-      .getResponse();
+    return ExitIntent.handle(handlerInput);
+    // return handlerInput.responseBuilder.speak(speechOutput)
+    //   .reprompt(speechOutput)
+    //   .getResponse();
   },
 };
 
+// diff between stop/cancel?
 const CancelIntent = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -132,9 +124,9 @@ const CancelIntent = {
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const speechOutput = requestAttributes.t('CANCEL_MESSAGE');
-
-    return handlerInput.responseBuilder.speak(speechOutput)
-      .getResponse();
+    return ExitIntent.handle(handlerInput);
+    // return handlerInput.responseBuilder.speak(speechOutput)
+    //   .getResponse();
   },
 };
 
@@ -146,7 +138,19 @@ const NoIntent = {
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const speechOutput = requestAttributes.t('NO_MESSAGE');
-    return handlerInput.responseBuilder.speak(speechOutput).getResponse();
+    return ExitIntent.handle(handlerInput);
+    // return handlerInput.responseBuilder.speak(speechOutput).getResponse();
+  },
+};
+
+const SessionEndedRequest = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+  },
+  handle(handlerInput) {
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+    // return ExitIntent.handle(handlerInput);
+    return handlerInput.responseBuilder.getResponse();
   },
 };
 
