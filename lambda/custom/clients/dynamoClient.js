@@ -26,25 +26,32 @@ function getCache(userID) {
 }
 
 function getClipData(isPaid) {
-  const keyExpression = isPaid ? 'begins_with(s3bucket, :b)'
+  const filterExpression = isPaid ? 'begins_with(s3bucket, :b)'
     : 's3bucket = :b';
   const bucketFilter = isPaid ? Constants.BUCKET_NAME_BASE : Constants.BUCKET_NAME_FREE;
   const params = {
     ExpressionAttributeValues: {
       ':b': bucketFilter,
-      ':p': 'default',
     },
-    KeyConditionExpression: `PK = :p and ${keyExpression}`,
+    FilterExpression: filterExpression,
     ProjectionExpression: 'clipID, characterName, s3bucket',
     TableName: 'quote_list',
   };
   console.log(`dynamo params${JSON.stringify(params)}`);
   return new Promise((resolve, reject) => {
-    Dynamo.query(params, (err, data) => {
+    Dynamo.scan(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
-        resolve(data.Items);
+        // shuffle clips order
+        const result = data.Items;
+        result.forEach((item, index) => {
+          const rand = Math.floor(Math.random() * data.Items.length);
+          const temp = data.Items[rand];
+          result[rand] = item;
+          result[index] = temp;
+        });
+        resolve(result);
       }
     });
   });

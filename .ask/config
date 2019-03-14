@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-sounds-of-the-office-default",
             "handler": "index.handler",
-            "revisionId": "70099e27-f589-4582-8006-de5df3379e26",
+            "revisionId": "cf971ee2-1d77-4f93-a373-4be53de9a2c1",
             "runtime": "nodejs8.10"
           }
         ]
