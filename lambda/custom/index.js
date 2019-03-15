@@ -5,7 +5,9 @@ const sprintf = require('i18next-sprintf-postprocessor');
 const Alexa = require('ask-sdk-core');
 const AWS = require('aws-sdk');
 const AmazonSpeech = require('ssml-builder/amazon_speech');
+const async = require('async');
 const Constants = require('./common/constants');
+const WelcomeHelpers = require('./helpers/welcomeHelpers');
 
 const {
   LaunchRequest,
@@ -60,10 +62,22 @@ const LocalizationInterceptor = {
 };
 
 const InitializationInterceptor = {
-  process(handlerInput) {
+  async process(handlerInput) {
+    console.log('INCOMING REQUEST');
+    console.log(JSON.stringify(handlerInput));
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     handlerInput.attributesManager
       .setRequestAttributes(Object.assign(requestAttributes, { speech: new AmazonSpeech() }));
+    if (!sessionAttributes.cache || !sessionAttributes.clips) {
+      const isPaid = true;
+      const userID = handlerInput.requestEnvelope.context.System.user.userId;
+      await WelcomeHelpers.getCacheAndClips(userID, isPaid)
+        .then((clipsAndCache) => {
+          Object.assign(sessionAttributes, clipsAndCache);
+          handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        });
+    }
   },
 };
 
