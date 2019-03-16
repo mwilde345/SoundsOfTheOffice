@@ -10,7 +10,7 @@
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "52deba14f1bda2cfa77a72f9019690ee"
+            "eTag": "1681a32f044af385ca73d6d0139c1787"
           }
         },
         "lambda": [
@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-sounds-of-the-office-default",
             "handler": "index.handler",
-            "revisionId": "1c2c2f0e-c810-43c6-a6e3-81d58a2c767c",
+            "revisionId": "166a9773-da73-49f0-b89d-cbe1a34fa704",
             "runtime": "nodejs8.10"
           }
         ]

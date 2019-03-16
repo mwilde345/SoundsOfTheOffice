@@ -20,12 +20,17 @@ const MultiQuoteIntent = {
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const { request } = handlerInput.requestEnvelope;
     const randomSuggestions = requestAttributes.t('MULTI_SUGGESTIONS');
-    let speechOutput = requestAttributes.speech
-      .say(requestAttributes.t('START_QUOTE_MESSAGE'))
-      .pause('200ms')
-      .say(randomSuggestions[Math.floor(Math.random() * randomSuggestions.length)])
-      .pause('200ms');
+    // if invoking the intent directly, give suggestions for what to say in the future.
+    // otherwise just continue playing quotes.
+    let speechOutput = request.intent.name === 'MultiQuoteIntent'
+      ? requestAttributes.speech
+        .say(requestAttributes.t('START_QUOTE_MESSAGE'))
+        .pause('200ms')
+        .say(randomSuggestions[Math.floor(Math.random() * randomSuggestions.length)])
+        .pause('200ms')
+      : requestAttributes.speech;
     Object.assign(sessionAttributes, MultiQuoteHelpers
       .getRandomQuotes(sessionAttributes, Constants.MULTI_QUOTE_COUNT));
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
@@ -35,6 +40,7 @@ const MultiQuoteIntent = {
         .audio(getS3Link(clip))
         .pause('200ms');
     });
+    speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
     speechOutput = speechOutput.ssml();
     return handlerInput.responseBuilder
       .speak(speechOutput)

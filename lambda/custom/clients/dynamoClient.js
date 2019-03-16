@@ -37,7 +37,6 @@ function getClipData(isPaid) {
     ProjectionExpression: 'clipID, characterName, s3bucket',
     TableName: 'quote_list',
   };
-  console.log(`dynamo params${JSON.stringify(params)}`);
   return new Promise((resolve, reject) => {
     Dynamo.scan(params, (err, data) => {
       if (err) {

@@ -5,9 +5,6 @@ const SingleQuoteHelpers = require('../helpers/singleQuoteHelpers');
 // ask skill for a flash briefing
 // when playing a game, this plays each question
 
-console.log(Constants);
-console.log(SingleQuoteHelpers);
-
 const SingleQuoteIntent = {
   canHandle(handlerInput) {
     const { request } = handlerInput.requestEnvelope;

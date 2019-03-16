@@ -3,31 +3,33 @@ const LANGUAGE_STRING = {
   en: {
     translation: {
       WELCOME_MESSAGE: 'Welcome to Sounds of the Office',
-      MENU_MESSAGE: 'Would you like to hear some quotes, or play a game?',
-      MENU_REPROMPT: 'You can say: Play some quotes. Or you can say: Play a game.',
+      MENU_MESSAGE: 'Main Menu. Would you like to hear some quotes, or play a game?',
+      MENU_REPROMPT: 'Are you still there? You can say: Play some quotes. Or you can say: Play a game. Say "exit" to leave the office.',
       START_QUOTE_MESSAGE: 'Ok, next time you can also say: ',
       MULTI_SUGGESTIONS: [
         'Play a few quotes.',
         'Play a few quotes from Michael.',
         'Get me some quotes from Kevin.',
-        'Few quotes from Michael.',
       ],
-      MULTI_QUOTE_REPROMPT: 'I hope you enjoyed that! Say: "more quotes" to hear more. Or say: "get bonus quotes" to '
-        + 'unlock tons of other quotes.',
+      MULTI_QUOTE_ENDING: 'I hope you enjoyed that! Would you like to hear more?',
+      // TODO: yes intent should tell them about bonus quotes before going on
+      MULTI_QUOTE_REPROMPT: 'Are you still there? Say "yes" or "more quotes" to hear more. Say "exit" to leave the office.',
       SINGLE_SUGGESTIONS: [
         'Play a quote.',
         'Get a quote from Michael.',
         'Get me a quote from Stanley.',
         'quote from Michael.',
       ],
+      EXIT_MESSAGE: 'Thanks for dropping in. Goodbye!',
+      CANCEL_MESSAGE: 'Thanks for dropping in. Goodbye!',
+      STOP_MESSAGE: 'What would you like to do? Say "continue", "main menu", or "quit".',
+      NO_MESSAGE: 'Thanks for dropping in. Goodbye!',
+
       GAME_NAME: 'Reindeer Trivia',
       HELP_MESSAGE: 'I will ask you %s multiple choice questions. Respond with the number of the answer. For example, say one, two, three, or four. To start a new game at any time, say, start game. ',
       REPEAT_QUESTION_MESSAGE: 'To repeat the last question, say, repeat. ',
       ASK_MESSAGE_START: 'Would you like to start playing?',
       HELP_REPROMPT: 'To give an answer to a question, respond with the number of the answer. ',
-      STOP_MESSAGE: 'Would you like to keep playing?',
-      CANCEL_MESSAGE: 'Ok, let\'s play again soon.',
-      NO_MESSAGE: 'Ok, we\'ll play another time. Goodbye!',
       TRIVIA_UNHANDLED: 'Try saying a number between 1 and %s',
       HELP_UNHANDLED: 'Say yes to continue, or no to end the game.',
       START_UNHANDLED: 'Say start to start a new game.',
@@ -79,4 +81,12 @@ module.exports = {
   S3_URL: 'https://s3.amazonaws.com/',
   MULTI_QUOTE_COUNT: 3,
   getRandomIntro,
+  DEFAULT_INTENTS: [
+    'AMAZON.YesIntent',
+    'AMAZON.NoIntent',
+    'AMAZON.CancelIntent',
+    'AMAZON.RepeatIntent',
+    'AMAZON.HelpIntent',
+    'AMAZON.StopIntent',
+  ],
 };

@@ -1,8 +1,6 @@
+const async = require('async');
 const Constants = require('../common/constants');
 const ExitHelpers = require('../helpers/exitHelpers');
-
-console.log(Constants);
-console.log(ExitHelpers);
 
 const ExitIntent = {
   canHandle(handlerInput) {
@@ -10,14 +8,16 @@ const ExitIntent = {
 
     return request.type === 'IntentRequest' && request.intent.name === 'ExitIntent';
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const userID = handlerInput.requestEnvelope.context.System.user.userId;
     const { cache } = sessionAttributes;
-    ExitHelpers.updateCache(userID, cache);
-    return handlerInput.responseBuilder
-      .speak(Constants.EXIT_MESSAGE)
-      .withShouldEndSession(true);
+    return ExitHelpers.updateCache(userID, cache)
+      .then(() => handlerInput.responseBuilder
+        .speak(requestAttributes.t('EXIT_MESSAGE'))
+        .withShouldEndSession(true)
+        .getResponse());
   },
 };
 

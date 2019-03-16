@@ -1,7 +1,11 @@
+const async = require('async');
 const GeneralHelpers = require('../helpers/generalHelpers');
 const Constants = require('../common/constants');
 const { WelcomeIntent } = require('./welcomeIntent');
 const { ExitIntent } = require('./exitIntent');
+const { MultiQuoteIntent } = require('./multiQuoteIntent');
+const { GameIntent } = require('./gameIntent');
+const { MenuIntent } = require('./menuIntent');
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -70,6 +74,7 @@ const AnswerIntent = {
   },
 };
 
+// TODO, put speechOutput into sessionAttributes in every speak handler, so we can repeat it.
 const RepeatIntent = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -90,12 +95,14 @@ const YesIntent = {
   },
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    if (sessionAttributes.questions) {
-      return handlerInput.responseBuilder.speak(sessionAttributes.speechOutput)
-        .reprompt(sessionAttributes.repromptText)
-        .getResponse();
+    switch (sessionAttributes.intentOfRequest) {
+      case 'MultiQuoteIntent':
+        return MultiQuoteIntent.handle(handlerInput);
+      case 'GameIntent':
+        return GameIntent.handle(handlerInput);
+      default:
+        return WelcomeIntent.handle(handlerInput);
     }
-    return GeneralHelpers.startGame(false, handlerInput);
   },
 };
 
@@ -107,11 +114,15 @@ const StopIntent = {
   },
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-    const speechOutput = requestAttributes.t('STOP_MESSAGE');
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const { intentOfRequest } = sessionAttributes;
+    if (intentOfRequest === 'MultiQuoteIntent' || intentOfRequest === 'GameIntent') {
+      const speechOutput = requestAttributes.t('STOP_MESSAGE');
+      return handlerInput.responseBuilder.speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
+    }
     return ExitIntent.handle(handlerInput);
-    // return handlerInput.responseBuilder.speak(speechOutput)
-    //   .reprompt(speechOutput)
-    //   .getResponse();
   },
 };
 
@@ -122,11 +133,7 @@ const CancelIntent = {
         && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent';
   },
   handle(handlerInput) {
-    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-    const speechOutput = requestAttributes.t('CANCEL_MESSAGE');
     return ExitIntent.handle(handlerInput);
-    // return handlerInput.responseBuilder.speak(speechOutput)
-    //   .getResponse();
   },
 };
 
@@ -136,10 +143,10 @@ const NoIntent = {
         && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent';
   },
   handle(handlerInput) {
-    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-    const speechOutput = requestAttributes.t('NO_MESSAGE');
-    return ExitIntent.handle(handlerInput);
-    // return handlerInput.responseBuilder.speak(speechOutput).getResponse();
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    Object.assign(sessionAttributes, { intentOfRequest: 'MenuIntent' });
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+    return MenuIntent.handle(handlerInput);
   },
 };
 

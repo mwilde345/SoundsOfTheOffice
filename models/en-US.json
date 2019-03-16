@@ -5,7 +5,14 @@
           "intents": [
               {
                   "name": "AMAZON.CancelIntent",
-                  "samples": []
+                  "samples": [
+                      "quit",
+                      "exit",
+                      "cancel",
+                      "i'm done",
+                      "end",
+                      "finished"
+                  ]
               },
               {
                   "name": "AMAZON.HelpIntent",
@@ -76,7 +83,18 @@
               },
               {
                   "name": "AMAZON.YesIntent",
-                  "samples": []
+                  "samples": [
+                      "continue",
+                      "yes",
+                      "yep",
+                      "confirm",
+                      "keep going",
+                      "i'm not done",
+                      "more",
+                      "yes please",
+                      "i want more",
+                      "play some more"
+                  ]
               },
               {
                   "name": "AMAZON.NoIntent",
