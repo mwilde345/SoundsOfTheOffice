@@ -143,6 +143,7 @@
                 "samples": [
                     "play a few quotes by {characterName}",
                     "get quotes from  {characterName}",
+                    "more from {characterName}",
                     "get a few quotes",
                     "play some quotes",
                     "hear some quotes",
@@ -158,15 +159,37 @@
               {
                   "name": "CHARACTER",
                   "values": [
-                      {
-                          "name": {
-                              "value": "dwight",
-                              "synonyms": [
-                                  "schrute",
-                                  "dwight schrute"
-                              ]
-                          }
-                      }
+                    {"name": {"value": "dwight","synonyms": ["dwight","dwight schrute","schrute"]}},
+                    {"name": {"value": "michael","synonyms": ["michael","michael scott","scott"]}},
+                    {"name": {"value": "pam","synonyms": ["pam","pam beesly","beesly"]}},
+                    {"name": {"value": "jim","synonyms": ["jim","jim halpert","halpert"]}},
+                    {"name": {"value": "kevin","synonyms": ["kevin","kevin malone","malone"]}},
+                    {"name": {"value": "toby","synonyms": ["toby","toby flenderson","flenderson"]}},
+                    {"name": {"value": "andy","synonyms": ["andy","andy bernard","bernard"]}},
+                    {"name": {"value": "angela","synonyms": ["angela","angela martin","martin"]}},
+                    {"name": {"value": "erin","synonyms": ["erin","erin hannon","hannon"]}},
+                    {"name": {"value": "creed","synonyms": ["creed","creed bratton","bratton"]}},
+                    {"name": {"value": "stanley","synonyms": ["stanley","stanley hudson","hudson"]}},
+                    {"name": {"value": "jan","synonyms": ["jan","jan levinson","levinson"]}},
+                    {"name": {"value": "ryan","synonyms": ["ryan","ryan howard","howard"]}},
+                    {"name": {"value": "holly","synonyms": ["holly","holly flax","flax"]}},
+                    {"name": {"value": "darryl","synonyms": ["darryl","darryl philbin","philbin"]}},
+                    {"name": {"value": "meredith","synonyms": ["meredith","meredith palmer","palmer"]}},
+                    {"name": {"value": "kelly","synonyms": ["kelly","kelly kapoor","kapoor"]}},
+                    {"name": {"value": "gabe","synonyms": ["gabe","gabe lewis","lewis"]}},
+                    {"name": {"value": "nellie","synonyms": ["nellie","nellie bertram","bertram"]}},
+                    {"name": {"value": "robert","synonyms": ["robert","robert california","california"]}},
+                    {"name": {"value": "charles","synonyms": ["charles","charles miner","miner"]}},
+                    {"name": {"value": "phyllis","synonyms": ["phyllis","phyllis vance","vance"]}},
+                    {"name": {"value": "oscar","synonyms": ["oscar","oscar martinez","martinez"]}},
+                    {"name": {"value": "pete","synonyms": ["pete","pete miller","miller"]}},
+                    {"name": {"value": "roy","synonyms": ["roy","roy anderson","anderson"]}},
+                    {"name": {"value": "jo","synonyms": ["jo","jo bennett","bennett"]}},
+                    {"name": {"value": "deangelo","synonyms": ["deangelo","deangelo vickers","vickers"]}},
+                    {"name": {"value": "josh","synonyms": ["josh","josh porter","porter"]}},
+                    {"name": {"value": "kat","synonyms": ["kat","katy","y"]}},
+                    {"name": {"value": "sa","synonyms": ["sa","sam","m"]}},
+                    {"name": {"value": "clark","synonyms": ["clark","clark green","green"]}}
                   ]
               }
           ]

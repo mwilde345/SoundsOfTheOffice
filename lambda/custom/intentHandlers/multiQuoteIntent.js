@@ -7,17 +7,14 @@ const MultiQuoteHelpers = require('../helpers/multiQuoteHelpers');
 // // // Any character, x, y z
 // next time say ask skill for some quotes from x
 
-function getS3Link(clip) {
-  const link = `${Constants.S3_URL}${clip.s3bucket}/${clip.clipID}.mp3`;
-  return link;
-}
-
 const MultiQuoteIntent = {
   canHandle(handlerInput) {
     const { request } = handlerInput.requestEnvelope;
     return request.type === 'IntentRequest' && request.intent.name === 'MultiQuoteIntent';
   },
   handle(handlerInput) {
+    // TODO: if given a character slot, and character has less than quote count quotes,
+    // let the user know. Then let them know how many are in the paid bucket if they are not paid.
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const { request } = handlerInput.requestEnvelope;
@@ -31,15 +28,8 @@ const MultiQuoteIntent = {
         .say(randomSuggestions[Math.floor(Math.random() * randomSuggestions.length)])
         .pause('200ms')
       : requestAttributes.speech;
-    Object.assign(sessionAttributes, MultiQuoteHelpers
-      .getRandomQuotes(sessionAttributes, Constants.MULTI_QUOTE_COUNT));
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    sessionAttributes.randomClips.forEach((clip) => {
-      speechOutput
-        .say(Constants.getRandomIntro(clip.characterName))
-        .audio(getS3Link(clip))
-        .pause('200ms');
-    });
+    speechOutput = MultiQuoteHelpers
+      .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
     speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
     speechOutput = speechOutput.ssml();
     return handlerInput.responseBuilder

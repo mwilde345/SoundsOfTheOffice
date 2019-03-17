@@ -83,6 +83,16 @@ const InitializationInterceptor = {
       await WelcomeHelpers.getCacheAndClips(userID, isPaid)
         .then((clipsAndCache) => {
           Object.assign(sessionAttributes, clipsAndCache);
+          const { clips } = clipsAndCache;
+          const clipsPerCharacter = {};
+          clips.map(({ clipID, characterName }) => {
+            if (!clipsPerCharacter[characterName]) {
+              clipsPerCharacter[characterName] = [clipID];
+            } else {
+              clipsPerCharacter[characterName].push(clipID);
+            }
+          });
+          Object.assign(sessionAttributes, { clipsPerCharacter });
           handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         });
     }
