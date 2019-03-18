@@ -1,25 +1,26 @@
 /* eslint-disable max-len */
+function generateQuoteEnding() {
+  const ENDING_STRINGS = [
+    'Having fun yet?',
+    'I can\'t help but laugh at these!',
+    'These are hilarious. I love my job.',
+    'I haven\'t had this much fun in a while!',
+    'How do these people not laugh while filming!?',
+  ];
+  return ENDING_STRINGS[Math.floor(Math.random() * ENDING_STRINGS.length)];
+}
 const LANGUAGE_STRING = {
   en: {
     translation: {
       WELCOME_MESSAGE: 'Welcome to Sounds of the Office',
-      MENU_MESSAGE: 'Main Menu. Would you like to hear some quotes, or play a game?',
-      MENU_REPROMPT: 'Are you still there? You can say: Play some quotes. Or you can say: Play a game. Say "exit" to leave the office.',
-      START_QUOTE_MESSAGE: 'Ok, next time you can also say: ',
-      MULTI_SUGGESTIONS: [
-        'Play a few quotes.',
-        'Play a few quotes from Michael.',
-        'Get me some quotes from Kevin.',
-      ],
-      MULTI_QUOTE_ENDING: 'I hope you enjoyed that! Would you like to hear more?',
+      MENU_MESSAGE: 'Main Menu. You can say "quotes" or "characters"?',
+      MENU_REPROMPT: 'Are you still there? You can say: "Play some quotes." Or you can say: "characters". Say "exit" to leave the office.',
+      START_QUOTE_MESSAGE: 'Next time you can skip the menu by saying: ',
+      MULTI_SUGGESTION: 'Ask Sounds of the Office to play a few quotes %s',
+      MULTI_QUOTE_ENDING: 'Would you like to hear more?',
       // TODO: yes intent should tell them about bonus quotes before going on
-      MULTI_QUOTE_REPROMPT: 'Are you still there? Say "yes" or "more quotes" to hear more. Say "exit" to leave the office.',
-      SINGLE_SUGGESTIONS: [
-        'Play a quote.',
-        'Get a quote from Michael.',
-        'Get me a quote from Stanley.',
-        'quote from Michael.',
-      ],
+      MULTI_QUOTE_REPROMPT: 'Are you still there? Say "more quotes" to hear more. Say "exit" to leave the office.',
+      SINGLE_SUGGESTION: 'Ask Sounds of the Office to play a quote %s',
       EXIT_MESSAGE: 'Thanks for dropping in. Goodbye!',
       CANCEL_MESSAGE: 'Thanks for dropping in. Goodbye!',
       STOP_MESSAGE: 'What would you like to do? Say "continue", "main menu", or "quit".',
@@ -64,10 +65,59 @@ function getRandomIntro(character) {
   const INTRO_STRINGS = [
     `${character} says: `,
     `Oh, here's a good one from ${character}: `,
-    `Let's see...another one from ${character}: `,
-    `${character} is one of my favorites!: `,
+    `This quote is from ${character}: `,
   ];
   return INTRO_STRINGS[Math.floor(Math.random() * INTRO_STRINGS.length)];
+}
+
+function getRandomIntroGivenCharacter(character) {
+  const INTRO_STRINGS = [
+    `Good choice, ${character} is hilarious.:`,
+    `That's funny, I think you and ${character} look a lot alike.:`,
+    `Ha! I knew you would pick ${character}. I just knew it.:`,
+    `${character} is a comedic genius!:`,
+    `Finally! I've been waiting for you to choose ${character}.:`,
+    `${character} is one of my favorites!:`,
+    `Here's what I have for ${character}:`,
+  ];
+  return INTRO_STRINGS[Math.floor(Math.random() * INTRO_STRINGS.length)];
+}
+
+function getRandomCharacter() {
+  const CHARACTERS = [
+    'dwight',
+    'michael',
+    'pam',
+    'jim',
+    'kevin',
+    'toby',
+    'andy',
+    'angela',
+    'erin',
+    'creed',
+    'stanley',
+    'jan',
+    'ryan',
+    'holly',
+    'darryl',
+    'meredith',
+    'kelly',
+    'gabe',
+    'nellie',
+    'robert',
+    'charles',
+    'phyllis',
+    'oscar',
+    'pete',
+    'roy',
+    'jo',
+    'deangelo',
+    'josh',
+    'kat',
+    'sa',
+    'clark',
+  ];
+  return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
 }
 
 module.exports = {
@@ -81,6 +131,7 @@ module.exports = {
   S3_URL: 'https://s3.amazonaws.com/',
   MULTI_QUOTE_COUNT: 3,
   getRandomIntro,
+  getRandomIntroGivenCharacter,
   DEFAULT_INTENTS: [
     'AMAZON.YesIntent',
     'AMAZON.NoIntent',
@@ -89,4 +140,6 @@ module.exports = {
     'AMAZON.HelpIntent',
     'AMAZON.StopIntent',
   ],
+  getRandomCharacter,
+  generateQuoteEnding,
 };

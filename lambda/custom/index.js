@@ -67,12 +67,6 @@ const InitializationInterceptor = {
     console.log(JSON.stringify(handlerInput));
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const { request } = handlerInput.requestEnvelope;
-    if (request.type === 'IntentRequest'
-    && !Constants.DEFAULT_INTENTS.includes(request.intent.name)) {
-      Object.assign(sessionAttributes, { intentOfRequest: request.intent.name });
-      handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    }
 
     handlerInput.attributesManager
       .setRequestAttributes(Object.assign(requestAttributes, { speech: new AmazonSpeech() }));
@@ -102,7 +96,12 @@ const InitializationInterceptor = {
 const ResponseInterceptor = {
   process(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const { request } = handlerInput.requestEnvelope;
+    if (request.type === 'IntentRequest'
+    && !Constants.DEFAULT_INTENTS.includes(request.intent.name)) {
+      Object.assign(sessionAttributes, { intentOfRequest: request.intent.name });
+      handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+    }
   },
 };
 

@@ -15,22 +15,16 @@ const MultiQuoteIntent = {
   handle(handlerInput) {
     // TODO: if given a character slot, and character has less than quote count quotes,
     // let the user know. Then let them know how many are in the paid bucket if they are not paid.
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-    const { request } = handlerInput.requestEnvelope;
-    const randomSuggestions = requestAttributes.t('MULTI_SUGGESTIONS');
     // if invoking the intent directly, give suggestions for what to say in the future.
     // otherwise just continue playing quotes.
-    let speechOutput = request.intent.name === 'MultiQuoteIntent'
-      ? requestAttributes.speech
-        .say(requestAttributes.t('START_QUOTE_MESSAGE'))
-        .pause('200ms')
-        .say(randomSuggestions[Math.floor(Math.random() * randomSuggestions.length)])
-        .pause('200ms')
-      : requestAttributes.speech;
+    // TODO: only do the suggestion message if coming from the menu. directly invoking should
+    // not have that.
+    // TODO: for the suggestion, use the character name if they specify it.
+    let speechOutput = requestAttributes.speech;
+
     speechOutput = MultiQuoteHelpers
       .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
-    speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
     speechOutput = speechOutput.ssml();
     return handlerInput.responseBuilder
       .speak(speechOutput)

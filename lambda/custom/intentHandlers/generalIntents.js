@@ -16,6 +16,9 @@ const LaunchRequest = {
           && request.intent.name === 'AMAZON.StartOverIntent');
   },
   handle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    handlerInput.attributesManager
+      .setSessionAttributes(Object.assign(sessionAttributes, { intentOfRequest: 'WelcomeIntent' }));
     return WelcomeIntent.handle(handlerInput);
   },
 };

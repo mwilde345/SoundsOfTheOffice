@@ -79,19 +79,54 @@ function filterCacheByCharacter(clips, cache, characterName) {
     : cache;
 }
 
+function handlePlural(wordBase, number) {
+  switch (number) {
+    case 1:
+      return wordBase;
+    default:
+      return `${wordBase}s`;
+  }
+}
+
 function getRandomQuotes(handlerInput, numClips, speechOutput) {
+  // TODO: add haveHeardMenu to attributes. So after each chunk of quotes we don't annoy them
+  // TODO: add givenCharacterName to sessionAttributes to preserve it when hitting YES and STOP intents
+  //   so when saying "yes" after quotes played, or "continue" when stopped, it can keep going.
+  // if we are continuing from a yes/stop intent, don't say oh i knew you would choose character.
+  // just say, i'll keep playing quotes from character.
+  // TODO: characterInfo intent. list off all the characters.
+  //  add characterName slot that will give # of quotes in free and paid bucket
   const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-  const characterName = handlerInput.requestEnvelope.request.intent.slots.characterName
+  const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+  const { request } = handlerInput.requestEnvelope;
+  const characterName = handlerInput.requestEnvelope.request.intent.slots
+    && handlerInput.requestEnvelope.request.intent.slots.characterName
     ? handlerInput.requestEnvelope.request.intent.slots.characterName.value : null;
+  // if they invoke this intent from welcome screen, it means they may
+  // not know how to invoke it directly. But if they come from the Menu screen,
+  // they still may not know because they may have come from the game screen.
+  if (sessionAttributes.intentOfRequest === 'WelcomeIntent') {
+    speechOutput
+      .say(requestAttributes.t('START_QUOTE_MESSAGE'))
+      .pause('200ms')
+      .say(
+        requestAttributes.t('MULTI_SUGGESTION', characterName ? `from ${characterName}.` : '.'),
+      )
+      .pause('700ms');
+  }
+  // blip from alexa about what character they chose.
+  if (characterName) {
+    speechOutput
+      .say(Constants.getRandomIntroGivenCharacter(characterName))
+      .pause('1s');
+  }
+
   const { cache } = sessionAttributes;
   const newCache = sessionAttributes.isPaid ? cache[Constants.BUCKET_NAME_FREE]
     .concat(cache[Constants.BUCKET_NAME_PAID])
     : cache[Constants.BUCKET_NAME_FREE];
-  console.log(newCache);
   let filteredClips = filterClipsByCharacter(sessionAttributes.clips, characterName);
-  console.log(filteredClips);
   let maximumViableClips = Math.min(filteredClips.length, numClips);
-  console.log(maximumViableClips);
   // TODO: only suggest to buy premium if the numQuotes there is
   // more than what is available in free version. If they are paid, then say
   // we will add more quotes or they can request some
@@ -102,7 +137,7 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
       return speechOutput;
     }
     if (characterName) {
-      speechOutput.say(`Sorry, I don't have any quotes from ${characterName}. But `
+      speechOutput.say(`Oops! That's embarrassing. I actually don't have any quotes from ${characterName}. But `
         + 'here are some quotes from other characters.');
       filteredClips = sessionAttributes.clips;
       maximumViableClips = Math.min(filteredClips.length, numClips);
@@ -112,7 +147,9 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
     }
   } else if (maximumViableClips < numClips) {
     if (characterName) {
-      speechOutput.say(`Turns out I only have ${maximumViableClips} quotes from ${characterName}.`);
+      // TODO: get the plural right for quote(s). 0, 1, many
+      speechOutput.say(`Turns out I only have ${maximumViableClips} `
+      + `${handlePlural('quote', maximumViableClips)} from ${characterName}.`);
       // if !isPaid, in the premium version I have x (> currentCount) quotes
       //    from characterName. buy now
     }
@@ -133,11 +170,22 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
     canPlay = canPlay.slice(0, maximumViableClips);
   }
   canPlay.forEach((clip) => {
+    // if they provide a character alias, don't prefix every clip with a blip about who says it.
     speechOutput
-      .say(Constants.getRandomIntro(clip.characterName))
+      .say(
+        characterName ? '' : Constants.getRandomIntro(clip.characterName),
+      )
       .audio(getS3Link(clip))
       .pause('200ms');
   });
+  speechOutput.say(Constants.generateQuoteEnding());
+  speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
+  if (!sessionAttributes.haveHeardMenu) {
+    speechOutput.say('Say: "yes", to hear random quotes.');
+    speechOutput.say(`You can also say: "more from ${characterName
+      || Constants.getRandomCharacter()}"`);
+    sessionAttributes.haveHeardMenu = true;
+  }
   sessionAttributes.cache = insertToCache(sessionAttributes.cache, canPlay);
   // sessionAttributes.cache = sessionAttributes.cache.concat(canPlay.map(clip => clip.clipID));
   handlerInput.attributesManager.setSessionAttributes(sessionAttributes);

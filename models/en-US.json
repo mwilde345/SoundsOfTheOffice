@@ -151,7 +151,8 @@
                     "get me some quotes",
                     "more quotes",
                     "more",
-                    "few quotes from {characterName}"
+                    "few quotes from {characterName}",
+                    "random quotes"
                 ]
               }
           ],
