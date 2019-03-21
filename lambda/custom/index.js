@@ -89,9 +89,8 @@ const InitializationInterceptor = {
       .setRequestAttributes(Object.assign(requestAttributes, { speech: new AmazonSpeech() }));
 
     if (!sessionAttributes.cache || !sessionAttributes.clips) {
-      const isPaid = true;
       const userID = handlerInput.requestEnvelope.context.System.user.userId;
-      await WelcomeHelpers.getCacheAndClips(userID, isPaid)
+      await WelcomeHelpers.getCacheAndClips(userID)
         .then((clipsAndCache) => {
           Object.assign(sessionAttributes, clipsAndCache);
           const { clips } = clipsAndCache;

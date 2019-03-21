@@ -63,7 +63,8 @@ const BuyResponseHandler = {
           case 'DECLINED':
             if (handlerInput.requestEnvelope.request.name === 'Buy') {
               // response when declined buy request
-              speechOutput.say(`Thanks for your interest in the ${product[0].name}. Wanna hear more free quotes?`);
+              speakOutput = `Thanks for your interest in the ${product[0].name}. Wanna hear more free quotes?`;
+              repromptOutput = 'Are you still there? Say "more quotes" to listen to some more free quotes.';
               break;
             }
             // response when declined upsell request
@@ -71,7 +72,7 @@ const BuyResponseHandler = {
             repromptOutput = 'Are you still there? Say "more quotes" to listen to some more free quotes.';
             break;
           case 'ALREADY_PURCHASED':
-            speakOutput = 'I\'ll shuffle the bonus quotes in with the free ones. Let\'s hear some!';
+            speechOutput.say('I\'m shuffling the bonus quotes in with the free ones. Let\'s hear some!');
             return MultiQuoteHelpers
               .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
           default:

@@ -97,7 +97,8 @@ function handleUpsell(handlerInput, productId, upsellMessage) {
 
 function getRandomQuotes(handlerInput, numClips, speechOutput) {
   // TODO: add haveHeardMenu to attributes. So after each chunk of quotes we don't annoy them
-  // TODO: add givenCharacterName to sessionAttributes to preserve it when hitting YES and STOP intents
+  // TODO: add givenCharacterName to sessionAttributes to preserve it
+  //  when hitting YES and STOP intents
   //   so when saying "yes" after quotes played, or "continue" when stopped, it can keep going.
   // if we are continuing from a yes/stop intent, don't say oh i knew you would choose character.
   // just say, i'll keep playing quotes from character.
@@ -136,7 +137,7 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
     : cache[Constants.BUCKET_NAME_FREE];
   let paidClipsForCharacterCount = 0;
   const allowedClips = sessionAttributes.clips
-    .filter(clip => (isPaid ? clip : clip.s3bucket === Constants.BUCKET_NAME_FREE));
+    .filter(clip => (isPaid ? true : clip.s3bucket === Constants.BUCKET_NAME_FREE));
   let filteredClips = filterClipsByCharacter(allowedClips, characterName, isPaid);
   let maximumViableClips = Math.min(filteredClips.length, numClips);
   if (!filteredClips.length) {
@@ -179,10 +180,11 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
   }
   const filteredCache = filterCacheByCharacter(filteredClips, newCache, characterName);
   let canPlay = filteredClips.filter(clip => (!filteredCache.includes(clip.clipID)));
+  if (allowedClips.length === newCache.length + canPlay.length) {
+    console.log('listened to all the quotes');
+    listenedToAll = true;
+  }
   if (canPlay.length < maximumViableClips) {
-    if (allowedClips.length + canPlay.length === newCache.length) {
-      listenedToAll = true;
-    }
     sessionAttributes.cache = clearCache(sessionAttributes, filteredClips);
     filteredClips.forEach((clip) => {
       // make sure we don't put duplicates into canPlay from the clips

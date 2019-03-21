@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-sounds-of-the-office-default",
             "handler": "index.handler",
-            "revisionId": "c02728cb-9592-439f-a6cd-4fa07d64a7cd",
+            "revisionId": "59098911-6b85-4085-a30d-f2780036aecb",
             "runtime": "nodejs8.10"
           }
         ]
@@ -33,7 +33,7 @@
           "deploy_status": "Update",
           "filePath": "isps/entitlement/Premium_Content.json",
           "productId": "amzn1.adg.product.4cc98e11-d37d-4a1a-908f-ed23dfc8edd9",
-          "eTag": "523b93378603c0aab1e5668b7bbf4449"
+          "eTag": "56ee0f84609d98f8973e56ab26849713"
         }
       ]
     }

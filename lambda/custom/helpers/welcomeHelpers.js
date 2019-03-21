@@ -2,14 +2,14 @@ const AWS = require('aws-sdk');
 const Constants = require('../common/constants');
 const DynamoClient = require('../clients/dynamoClient').init(AWS);
 
-function getCacheAndClips(userID, isPaid) {
+function getCacheAndClips(userID) {
   const cacheAndClips = {
     clips: {},
     cache: {},
   };
   return new Promise((resolve, reject) => {
     try {
-      DynamoClient.getClipData(isPaid)
+      DynamoClient.getClipData()
         .then((clipData) => {
           // clipData lists all the clips for that bucket
           cacheAndClips.clips = clipData;

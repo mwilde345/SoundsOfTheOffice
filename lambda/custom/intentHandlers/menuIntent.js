@@ -14,6 +14,9 @@ const MenuIntent = {
     const speechOutput = requestAttributes.speech
       .say(isPaid ? requestAttributes.t('MENU_MESSAGE_PREMIUM')
         : requestAttributes.t('WELCOME_MESSAGE_FREE'))
+      .say(isPaid ? requestAttributes.t('MENU_MESSAGE_PREMIUM')
+        : requestAttributes.t('MENU_MESSAGE_FREE'))
+      .say('Say "quit" to leave the office')
       .ssml();
     return handlerInput.responseBuilder
       .speak(speechOutput)
