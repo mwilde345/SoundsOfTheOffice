@@ -1,5 +1,5 @@
 const Constants = require('../common/constants');
-const PurchaseHelpers = require('../helpers/purchaseHelpers');
+const MultiQuoteHelpers = require('../helpers/multiQuoteHelpers');
 // Following handler demonstrates how Skills would receive Cancel requests from customers
 // and then trigger a cancel request to Alexa
 // User says: Alexa, ask <skill name> to cancel <product name>
@@ -57,26 +57,26 @@ const CancelResponseHandler = {
     const { locale } = handlerInput.requestEnvelope.request;
     const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
     const { productId } = handlerInput.requestEnvelope.request.payload;
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const speechOutput = requestAttributes.speech;
 
     return ms.getInSkillProducts(locale).then((result) => {
       const product = result.inSkillProducts.filter(record => record.productId === productId);
       console.log(`PRODUCT = ${JSON.stringify(product)}`);
       if (handlerInput.requestEnvelope.request.status.code === '200') {
         if (handlerInput.requestEnvelope.request.payload.purchaseResult === 'ACCEPTED') {
-          const speakOutput = `You have successfully cancelled your subscription. ${getRandomYesNoQuestion()}`;
-          const repromptOutput = getRandomYesNoQuestion();
-          return handlerInput.responseBuilder
-            .speak(speakOutput)
-            .reprompt(repromptOutput)
-            .getResponse();
+          speechOutput.say(`You have successfully refunded your purchase of ${product.name}.`
+            + 'Let\'s listen to some awesome free quotes now.');
+
+          return MultiQuoteHelpers
+            .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
         }
         if (handlerInput.requestEnvelope.request.payload.purchaseResult === 'NOT_ENTITLED') {
-          const speakOutput = `You don't currently have a subscription to cancel. ${getRandomYesNoQuestion()}`;
-          const repromptOutput = getRandomYesNoQuestion();
-          return handlerInput.responseBuilder
-            .speak(speakOutput)
-            .reprompt(repromptOutput)
-            .getResponse();
+          speechOutput.say('You don\'t currently have any products to refund. Let\'s get back to the office.');
+
+
+          return MultiQuoteHelpers
+            .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
         }
       }
       // Something failed.

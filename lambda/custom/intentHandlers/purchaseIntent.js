@@ -1,5 +1,6 @@
 const Constants = require('../common/constants');
 const PurchaseHelpers = require('../helpers/purchaseHelpers');
+const MultiQuoteHelpers = require('../helpers/multiQuoteHelpers');
 
 const PurchaseIntent = {
   canHandle(handlerInput) {
@@ -8,7 +9,6 @@ const PurchaseIntent = {
     return request.type === 'IntentRequest' && request.intent.name === 'PurchaseIntent';
   },
   handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const { locale } = handlerInput.requestEnvelope.request;
     const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
     return ms.getInSkillProducts(locale).then((result) => {
@@ -29,10 +29,6 @@ const PurchaseIntent = {
           })
           .getResponse();
       }
-      return handlerInput.responseBuilder
-        .speak('I don\'t think we have a product by that name.  Can you try again?')
-        .reprompt('I didn\'t catch that. Can you try again?')
-        .getResponse();
     });
   },
 };
@@ -49,7 +45,8 @@ const BuyResponseHandler = {
     const { locale } = handlerInput.requestEnvelope.request;
     const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
     const { productId } = handlerInput.requestEnvelope.request.payload;
-
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const speechOutput = requestAttributes.speech;
     return ms.getInSkillProducts(locale).then((result) => {
       const product = result.inSkillProducts.filter(record => record.productId === productId);
       console.log(`PRODUCT = ${JSON.stringify(product)}`);
@@ -58,32 +55,29 @@ const BuyResponseHandler = {
         let repromptOutput;
         switch (handlerInput.requestEnvelope.request.payload.purchaseResult) {
           case 'ACCEPTED':
-
-            speakOutput = `You have unlocked the ${product[0].name}.  Here is one of your new quotes: lolz.`;
-            repromptOutput = 'sup reprompt';
-            break;
+            speechOutput.say(
+              `You have unlocked the ${product[0].name}.  Let's listen to some of the bonus quotes.`,
+            );
+            return MultiQuoteHelpers
+              .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
           case 'DECLINED':
             if (handlerInput.requestEnvelope.request.name === 'Buy') {
               // response when declined buy request
-              speakOutput = `Thanks for your interest in the ${product[0].name}. sucker.`;
-              repromptOutput = 'Would you like another random fact?';
+              speechOutput.say(`Thanks for your interest in the ${product[0].name}. Wanna hear more free quotes?`);
               break;
             }
             // response when declined upsell request
-            speakOutput = 'OK.  Here\'s a random fact: poop. Would you like another random fact?';
-            repromptOutput = 'Would you like another random fact?';
+            speakOutput = 'OK. Do you want to hear some more free quotes?';
+            repromptOutput = 'Are you still there? Say "more quotes" to listen to some more free quotes.';
             break;
           case 'ALREADY_PURCHASED':
-            // may have access to more than what was asked for, but give them a random
-            // fact from the product they asked to buy
-
-            speakOutput = 'Here is your fact: already bought that shiz.';
-            repromptOutput = 'sup reprompt';
-            break;
+            speakOutput = 'Let\'s listen to some of the bonus quotes.';
+            return MultiQuoteHelpers
+              .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
           default:
             console.log(`unhandled purchaseResult: ${handlerInput.requestEnvelope.payload.purchaseResult}`);
-            speakOutput = `Something unexpected happened, but thanks for your interest in the ${product[0].name}.  Would you like another random fact?`;
-            repromptOutput = 'Would you like another random fact?';
+            speakOutput = `Something unexpected happened, but thanks for your interest in the ${product[0].name}.  Would you like to hear more free quotes?`;
+            repromptOutput = 'Would you like another free quote?';
             break;
         }
         return handlerInput.responseBuilder

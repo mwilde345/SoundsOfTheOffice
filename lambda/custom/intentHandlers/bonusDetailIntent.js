@@ -17,28 +17,7 @@ const BonusDetailIntent = {
     const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
 
     return ms.getInSkillProducts(locale).then((result) => {
-      // let productCategory = getResolvedValue(handlerInput.requestEnvelope, 'productCategory');
-      // const spokenCategory = getSpokenValue(handlerInput.requestEnvelope, 'productCategory');
-
-      // // nothing spoken for the slot value
-      // if (spokenCategory === undefined) {
-      //   return handlerInput.responseBuilder
-      //     .addDelegateDirective()
-      //     .getResponse();
-      // }
-
-      // // NO ENTITY RESOLUTION MATCH
-      // if (productCategory === undefined) {
-      //   return handlerInput.responseBuilder
-      //     .speak('I don\'t think we have a product by that name.  Can you try again?')
-      //     .reprompt('I didn\'t catch that. Can you try again?')
-      //     .getResponse();
-      // }
-
-      // if (productCategory !== 'all_access') productCategory += '_pack';
-
       const product = result.inSkillProducts;
-      // .filter(record => record.referenceName === productCategory);
 
       if (isProduct(product)) {
         const speakOutput = `${product[0].summary}. To buy it, say Buy ${product[0].name}. `;

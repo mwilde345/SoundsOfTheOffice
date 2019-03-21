@@ -10,8 +10,10 @@ const MenuIntent = {
   },
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const { isPaid } = handlerInput.attributesManager.getSessionAttributes();
     const speechOutput = requestAttributes.speech
-      .say(requestAttributes.t('MENU_MESSAGE'))
+      .say(isPaid ? requestAttributes.t('MENU_MESSAGE_PREMIUM')
+        : requestAttributes.t('WELCOME_MESSAGE_FREE'))
       .ssml();
     return handlerInput.responseBuilder
       .speak(speechOutput)

@@ -28,18 +28,6 @@ const mockAttributes = {
   ],
 };
 
-function buildCanPlay(sessionAttributes) {
-  // clips is list of object [{clipID: 'clip1', character: '', s3bucket: ''}]
-  const { clips } = sessionAttributes;
-  // cache is list of string clipIDs ['clip1','clip2']
-  const { cache } = sessionAttributes;
-  const newCache = sessionAttributes.isPaid ? cache[Constants.BUCKET_NAME_FREE]
-    .concat(cache[Constants.BUCKET_NAME_PAID])
-    : cache[Constants.BUCKET_NAME_FREE];
-  const canPlay = clips.filter(clip => (!newCache.includes(clip.clipID)));
-  return canPlay;
-}
-
 function insertToCache(cache, canPlay) {
   canPlay.forEach((clip) => {
     cache[clip.s3bucket].push(clip.clipID);
@@ -90,6 +78,23 @@ function handlePlural(wordBase, number) {
   }
 }
 
+function handleUpsell(handlerInput, productId, upsellMessage) {
+  return handlerInput.responseBuilder
+    .addDirective({
+      type: 'Connections.SendRequest',
+      name: 'Upsell',
+      payload: {
+        InSkillProduct: {
+          productId,
+        },
+        upsellMessage,
+      },
+      token: 'correlationToken',
+    })
+    .getResponse();
+}
+
+
 function getRandomQuotes(handlerInput, numClips, speechOutput) {
   // TODO: add haveHeardMenu to attributes. So after each chunk of quotes we don't annoy them
   // TODO: add givenCharacterName to sessionAttributes to preserve it when hitting YES and STOP intents
@@ -101,9 +106,9 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
   const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
   const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
   const {
-    isPaid, paidClipCount, freeClipCount, clipsPerCharacter,
+    isPaid, paidClipCount, freeClipCount, clipsPerCharacter, cache, productId,
   } = sessionAttributes;
-  const { request } = handlerInput.requestEnvelope;
+  let listenedToAll = false;
   const characterName = handlerInput.requestEnvelope.request.intent.slots
     && handlerInput.requestEnvelope.request.intent.slots.characterName
     ? handlerInput.requestEnvelope.request.intent.slots.characterName.value : null;
@@ -126,30 +131,33 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
       .pause('1s');
   }
 
-  const { cache } = sessionAttributes;
   const newCache = sessionAttributes.isPaid ? cache[Constants.BUCKET_NAME_FREE]
     .concat(cache[Constants.BUCKET_NAME_PAID])
     : cache[Constants.BUCKET_NAME_FREE];
   let paidClipsForCharacterCount = 0;
-  let filteredClips = filterClipsByCharacter(sessionAttributes.clips, characterName, isPaid);
+  const allowedClips = sessionAttributes.clips
+    .filter(clip => (isPaid ? clip : clip.s3bucket === Constants.BUCKET_NAME_FREE));
+  let filteredClips = filterClipsByCharacter(allowedClips, characterName, isPaid);
   let maximumViableClips = Math.min(filteredClips.length, numClips);
   if (!filteredClips.length) {
     if (!sessionAttributes.clips.length) {
       speechOutput.say('Sorry, I don\'t have any quotes I can play for you.');
       if (!isPaid && paidClipCount > 0) {
-        speechOutput.say(`You can purchase premium quotes and get access to ${paidClipCount} bonus quotes.`
+        speechOutput.say(`You can purchase the bonus content and get access to ${paidClipCount} bonus quotes.`
           + 'Say "get bonus quotes" for more details.');
       } else if (isPaid) {
         speechOutput.say('Thank you for purchasing the premium pack, I\'m sorry that I don\'t have any quotes right now.'
-        + 'There must be a mistake. Leave a comment in the alexa app and I\'ll fix it soon.');
+        + 'There must be a mistake. I\'ll fix it soon!');
       }
       return speechOutput;
     }
     if (characterName) {
-      paidClipsForCharacterCount = clipsPerCharacter[Constants.BUCKET_NAME_PAID][characterName].length;
+      paidClipsForCharacterCount = clipsPerCharacter[Constants.BUCKET_NAME_PAID][characterName]
+        .length;
       speechOutput.say(`Oops! That's embarrassing. I actually don't have any quotes from ${characterName}.`);
       if (!isPaid && paidClipsForCharacterCount) {
-        speechOutput.say(`However, there are ${paidClipsForCharacterCount} quotes from ${characterName} in the bonus `
+        speechOutput.say(`However, I have ${paidClipsForCharacterCount} `
+        + `${handlePlural('quote', paidClipsForCharacterCount)} from ${characterName} in the bonus `
         + 'quotes pack. Say "get bonus quotes" to learn more.');
       }
       speechOutput.say('In the meantime, here are some quotes from random characters: ');
@@ -158,18 +166,23 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
     }
   } else if (maximumViableClips < numClips) {
     if (characterName) {
+      // TODO: keep track of whether or not they've heard the bonus upsell for a specific character
       speechOutput.say(`Turns out I only have ${maximumViableClips} `
       + `${handlePlural('quote', maximumViableClips)} from ${characterName}.`);
-      if (!isPaid && paidClipsForCharacterCount) {
-        speechOutput.say(`In the bonus quote pack, there are ${paidClipsForCharacterCount} quotes from ${characterName}`
-        + ' that you can listen to. Say "get bonus quotes" to learn more.');
+      if (!isPaid && paidClipsForCharacterCount > maximumViableClips) {
+        speechOutput.say(`In the bonus quote pack, I have ${paidClipsForCharacterCount} `
+        + `${handlePlural('quote', paidClipsForCharacterCount)} from ${characterName}`
+        + ' that you can listen to. Say "get bonus quotes" to learn more. Anyway, let\'s see what '
+        + `${characterName} has to say: `);
       }
     }
   }
   const filteredCache = filterCacheByCharacter(filteredClips, newCache, characterName);
-  // TODO: suggest purchase after playing half/all quotes
   let canPlay = filteredClips.filter(clip => (!filteredCache.includes(clip.clipID)));
   if (canPlay.length < maximumViableClips) {
+    if (allowedClips.length + canPlay.length === newCache.length) {
+      listenedToAll = true;
+    }
     sessionAttributes.cache = clearCache(sessionAttributes, filteredClips);
     filteredClips.forEach((clip) => {
       // make sure we don't put duplicates into canPlay from the clips
@@ -190,26 +203,20 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
       .audio(getS3Link(clip))
       .pause('200ms');
   });
-  // TODO: if they have listened to all free quotes, do the upsell. Do this when we clear cache?:
-  /* upsellMessage = `You don't currently own the ${factCategory} pack.
-      ${categoryProduct[0].summary} Want to learn more?`;
 
-            return handlerInput.responseBuilder
-              .addDirective({
-                type: 'Connections.SendRequest',
-                name: 'Upsell',
-                payload: {
-                  InSkillProduct: {
-                    productId: categoryProduct[0].productId,
-                  },
-                  upsellMessage: upsellMessage,
-                },
-                token: 'correlationToken',
-              })
-              .getResponse();
-              */
   speechOutput.say(Constants.generateQuoteEnding());
-  speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
+  if (listenedToAll) {
+    if (isPaid) {
+      speechOutput.say(`Nice job! You've listend to all ${freeClipCount} free quotes, and all ${paidClipCount} bonus quotes.`
+        + 'Check back soon for brand new quotes that will be added! I\'ll go ahead and reshuffle them. Wanna keep going?');
+    } else {
+      speechOutput.say(`Nice job! You've listened to all ${freeClipCount} free quotes. Did you know there are ${paidClipCount} `
+        + 'more bonus quotes you can get? Don\'t miss out on hearing more of your favorite characters! Want to learn more?');
+      return handleUpsell(handlerInput, productId, speechOutput.ssml());
+    }
+  } else {
+    speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
+  }
   if (!sessionAttributes.haveHeardMenu) {
     speechOutput.say('Say: "yes", to hear random quotes.');
     speechOutput.say(`You can also say: "more from ${characterName

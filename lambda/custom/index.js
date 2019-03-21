@@ -146,6 +146,9 @@ const EntitledProductsCheck = {
         const entitledProducts = getAllEntitledProducts(result.inSkillProducts);
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         sessionAttributes.isPaid = entitledProducts.length > 0;
+        if (result.inSkillProducts.length) {
+          sessionAttributes.productId = result.inSkillProducts[0].productId;
+        }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
       } catch (error) {
         console.log(`Error calling InSkillProducts API: ${error}`);

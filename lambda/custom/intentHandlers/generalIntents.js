@@ -99,6 +99,7 @@ const YesIntent = {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     switch (sessionAttributes.intentOfRequest) {
       case 'MultiQuoteIntent':
+      case 'PurchaseIntent':
         return MultiQuoteIntent.handle(handlerInput);
       case 'GameIntent':
         return GameIntent.handle(handlerInput);
