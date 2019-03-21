@@ -1,4 +1,3 @@
-const async = require('async');
 const GeneralHelpers = require('../helpers/generalHelpers');
 const Constants = require('../common/constants');
 const { WelcomeIntent } = require('./welcomeIntent');
@@ -160,7 +159,10 @@ const SessionEndedRequest = {
   handle(handlerInput) {
     console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
     // return ExitIntent.handle(handlerInput);
-    return handlerInput.responseBuilder.getResponse();
+    return handlerInput.responseBuilder
+      .speak('Session is over')
+      .withShouldEndSession(true)
+      .getResponse();
   },
 };
 

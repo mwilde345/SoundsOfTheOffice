@@ -6,11 +6,11 @@
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "d66c9d45b3600f7f6f883334fc6573f5"
+          "eTag": "d016c9426973b508d0f3a58a6c6834a9"
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "2b189ccad6005edfc0b1189bcc6d2c51"
+            "eTag": "b8d63a024692ac3684c546c0a7831e74"
           }
         },
         "lambda": [
@@ -23,11 +23,19 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-sounds-of-the-office-default",
             "handler": "index.handler",
-            "revisionId": "3cea33d3-a49e-4bf7-aa76-bfa1427355cc",
+            "revisionId": "2186035f-e2af-4a9e-884e-eb1b6707f77a",
             "runtime": "nodejs8.10"
           }
         ]
-      }
+      },
+      "in_skill_products": [
+        {
+          "deploy_status": "Update",
+          "filePath": "isps/entitlement/Premium_Content.json",
+          "productId": "amzn1.adg.product.4cc98e11-d37d-4a1a-908f-ed23dfc8edd9",
+          "eTag": "523b93378603c0aab1e5668b7bbf4449"
+        }
+      ]
     }
   }
 }

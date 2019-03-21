@@ -129,7 +129,44 @@
                     "bonus quotes",
                     "buy",
                     "purchase",
-                    "download more quotes"
+                    "download more quotes",
+                    "buy bonus quotes",
+                    "buy premium version",
+                    "get premium"
+                ]
+              },
+              {
+                "name": "PurchaseOptionsIntent",
+                "samples": [
+                    "what can i buy",
+                    "I want to buy",
+                    "can i buy something",
+                    "what is available to buy",
+                    "i want to purchase"
+                ]
+              },
+              {
+                  "name": "BonusDetailIntent",
+                  "samples": [
+                      "Tell me about bonus quotes",
+                      "Tell me about premium content",
+                      "I want to hear about extra content",
+                      "tell me more about bonus",
+                      "what is the extra content",
+                      "what is bonus",
+                      "bonus quotes info"
+                  ]
+              },
+              {
+                "name": "CancelSubscriptionIntent",
+                "samples": [
+                  "cancel bonus quotes",
+                  "cancel purchase",
+                  "refund bonus quotes",
+                  "refund purchase",
+                  "return premium content",
+                  "return bonus quotes",
+                  "refund extra quotes"
                 ]
               },
               {

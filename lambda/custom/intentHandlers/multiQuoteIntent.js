@@ -22,7 +22,6 @@ const MultiQuoteIntent = {
     // not have that.
     // TODO: for the suggestion, use the character name if they specify it.
     let speechOutput = requestAttributes.speech;
-
     speechOutput = MultiQuoteHelpers
       .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
     speechOutput = speechOutput.ssml();

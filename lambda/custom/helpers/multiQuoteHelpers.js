@@ -66,11 +66,13 @@ function getS3Link(clip) {
   return link;
 }
 
-function filterClipsByCharacter(clips, characterName) {
+function filterClipsByCharacter(clips, characterName, isPaid) {
+  const filteredByPaid = clips
+    .filter(clip => (isPaid ? true : clip.s3bucket === Constants.BUCKET_NAME_FREE));
   return characterName
-    ? clips
+    ? filteredByPaid
       .filter(clip => clip.characterName.toLowerCase() === characterName.toLowerCase())
-    : clips;
+    : filteredByPaid;
 }
 
 function filterCacheByCharacter(clips, cache, characterName) {
@@ -98,6 +100,9 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
   //  add characterName slot that will give # of quotes in free and paid bucket
   const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
   const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+  const {
+    isPaid, paidClipCount, freeClipCount, clipsPerCharacter,
+  } = sessionAttributes;
   const { request } = handlerInput.requestEnvelope;
   const characterName = handlerInput.requestEnvelope.request.intent.slots
     && handlerInput.requestEnvelope.request.intent.slots.characterName
@@ -125,37 +130,44 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
   const newCache = sessionAttributes.isPaid ? cache[Constants.BUCKET_NAME_FREE]
     .concat(cache[Constants.BUCKET_NAME_PAID])
     : cache[Constants.BUCKET_NAME_FREE];
-  let filteredClips = filterClipsByCharacter(sessionAttributes.clips, characterName);
+  let paidClipsForCharacterCount = 0;
+  let filteredClips = filterClipsByCharacter(sessionAttributes.clips, characterName, isPaid);
   let maximumViableClips = Math.min(filteredClips.length, numClips);
-  // TODO: only suggest to buy premium if the numQuotes there is
-  // more than what is available in free version. If they are paid, then say
-  // we will add more quotes or they can request some
   if (!filteredClips.length) {
     if (!sessionAttributes.clips.length) {
       speechOutput.say('Sorry, I don\'t have any quotes I can play for you.');
-      // if !isPaid, but I have x (> currentCount) premium quotes. buy now.
+      if (!isPaid && paidClipCount > 0) {
+        speechOutput.say(`You can purchase premium quotes and get access to ${paidClipCount} bonus quotes.`
+          + 'Say "get bonus quotes" for more details.');
+      } else if (isPaid) {
+        speechOutput.say('Thank you for purchasing the premium pack, I\'m sorry that I don\'t have any quotes right now.'
+        + 'There must be a mistake. Leave a comment in the alexa app and I\'ll fix it soon.');
+      }
       return speechOutput;
     }
     if (characterName) {
-      speechOutput.say(`Oops! That's embarrassing. I actually don't have any quotes from ${characterName}. But `
-        + 'here are some quotes from other characters.');
+      paidClipsForCharacterCount = clipsPerCharacter[Constants.BUCKET_NAME_PAID][characterName].length;
+      speechOutput.say(`Oops! That's embarrassing. I actually don't have any quotes from ${characterName}.`);
+      if (!isPaid && paidClipsForCharacterCount) {
+        speechOutput.say(`However, there are ${paidClipsForCharacterCount} quotes from ${characterName} in the bonus `
+        + 'quotes pack. Say "get bonus quotes" to learn more.');
+      }
+      speechOutput.say('In the meantime, here are some quotes from random characters: ');
       filteredClips = sessionAttributes.clips;
       maximumViableClips = Math.min(filteredClips.length, numClips);
-      //    if !isPaid, in the premium version I have x (> currentCount) quotes
-      //      from ${characterName}. buy now
-      //    (this means the s3 call would always need to get both paid and free)
     }
   } else if (maximumViableClips < numClips) {
     if (characterName) {
-      // TODO: get the plural right for quote(s). 0, 1, many
       speechOutput.say(`Turns out I only have ${maximumViableClips} `
       + `${handlePlural('quote', maximumViableClips)} from ${characterName}.`);
-      // if !isPaid, in the premium version I have x (> currentCount) quotes
-      //    from characterName. buy now
+      if (!isPaid && paidClipsForCharacterCount) {
+        speechOutput.say(`In the bonus quote pack, there are ${paidClipsForCharacterCount} quotes from ${characterName}`
+        + ' that you can listen to. Say "get bonus quotes" to learn more.');
+      }
     }
-    // else just play what you got.
   }
   const filteredCache = filterCacheByCharacter(filteredClips, newCache, characterName);
+  // TODO: suggest purchase after playing half/all quotes
   let canPlay = filteredClips.filter(clip => (!filteredCache.includes(clip.clipID)));
   if (canPlay.length < maximumViableClips) {
     sessionAttributes.cache = clearCache(sessionAttributes, filteredClips);
@@ -178,6 +190,24 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
       .audio(getS3Link(clip))
       .pause('200ms');
   });
+  // TODO: if they have listened to all free quotes, do the upsell. Do this when we clear cache?:
+  /* upsellMessage = `You don't currently own the ${factCategory} pack.
+      ${categoryProduct[0].summary} Want to learn more?`;
+
+            return handlerInput.responseBuilder
+              .addDirective({
+                type: 'Connections.SendRequest',
+                name: 'Upsell',
+                payload: {
+                  InSkillProduct: {
+                    productId: categoryProduct[0].productId,
+                  },
+                  upsellMessage: upsellMessage,
+                },
+                token: 'correlationToken',
+              })
+              .getResponse();
+              */
   speechOutput.say(Constants.generateQuoteEnding());
   speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
   if (!sessionAttributes.haveHeardMenu) {

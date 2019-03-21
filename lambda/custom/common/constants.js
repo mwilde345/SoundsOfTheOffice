@@ -12,13 +12,14 @@ function generateQuoteEnding() {
 const LANGUAGE_STRING = {
   en: {
     translation: {
-      WELCOME_MESSAGE: 'Welcome to Sounds of the Office',
-      MENU_MESSAGE: 'Main Menu. You can say "quotes" or "characters"?',
-      MENU_REPROMPT: 'Are you still there? You can say: "Play some quotes." Or you can say: "characters". Say "exit" to leave the office.',
+      WELCOME_MESSAGE_FREE: 'Welcome to Sounds of the Office',
+      WELCOME_MESSAGE_PREMIUM: 'Welcome to Sounds of the Office: Premium Version',
+      MENU_MESSAGE_PREMIUM: 'You have access to all premium quotes. Say: "Play Quotes" to get started!',
+      MENU_MESSAGE_FREE: 'Say: "Play Quotes" to get started. To get tons of bonus quotes, say: "bonus quotes".',
+      MENU_REPROMPT: 'Are you still there? You can say: "Play some quotes." Say "help" for more help. Say "exit" to leave the office.',
       START_QUOTE_MESSAGE: 'Next time you can skip the menu by saying: ',
       MULTI_SUGGESTION: 'Ask Sounds of the Office to play a few quotes %s',
       MULTI_QUOTE_ENDING: 'Would you like to hear more?',
-      // TODO: yes intent should tell them about bonus quotes before going on
       MULTI_QUOTE_REPROMPT: 'Are you still there? Say "more quotes" to hear more. Say "exit" to leave the office.',
       SINGLE_SUGGESTION: 'Ask Sounds of the Office to play a quote %s',
       EXIT_MESSAGE: 'Thanks for dropping in. Goodbye!',

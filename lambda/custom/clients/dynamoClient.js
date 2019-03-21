@@ -25,10 +25,9 @@ function getCache(userID) {
   });
 }
 
-function getClipData(isPaid) {
-  const filterExpression = isPaid ? 'begins_with(s3bucket, :b)'
-    : 's3bucket = :b';
-  const bucketFilter = isPaid ? Constants.BUCKET_NAME_BASE : Constants.BUCKET_NAME_FREE;
+function getClipData() {
+  const filterExpression = 'begins_with(s3bucket, :b)';
+  const bucketFilter = Constants.BUCKET_NAME_BASE;
   const params = {
     ExpressionAttributeValues: {
       ':b': bucketFilter,

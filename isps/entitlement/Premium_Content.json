@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "type": "ENTITLEMENT",
+  "referenceName": "Premium_Content",
+  "publishingInformation": {
+    "locales": {
+      "en-US": {
+        "name": "Bonus Content",
+        "summary": "Get access to hundreds more quotes, and cool features that are coming out!",
+        "description": "This add-on provides you access to at least 100 more quotes from your favorite office characters. You will also get access to new features that will be released, like voting on quotes and playing \"Guess the Character\". The number of quotes you get access to will always increase as I add more and more to the skill. What are you waiting for?!",
+        "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/c6a4/aaa3eaaac8ac43f6bb161e47342ba984/APP_ICON?versionId=viNfyDifslLE_ZkseIIvJkmPho5Ntfzu&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1553105037&Signature=3XABd3PCTt8MSsMK2iZO5hm%2FRNg%3D",
+        "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/8b93/5f3290a3438b4103900f8dfd1f8c151c/APP_ICON_LARGE?versionId=tLUbMK6b2MG2vkUzclHdYRCLyEmWnRgO&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1553105037&Signature=jMEdm%2B%2FZHrzFjIsVHoR8TOGnzZ4%3D",
+        "examplePhrases": [
+          "Alexa, buy bonus quotes.",
+          "Alexa, buy extra content.",
+          "Alexa, buy premium version."
+        ],
+        "keywords": [
+          "bonus quotes",
+          "the office quotes",
+          "bonus office quotes",
+          "sounds of the office bonus",
+          "the office"
+        ],
+        "customProductPrompts": {
+          "purchasePromptDescription": "Bonus content includes at least 100 bonus quotes to hear, and lifetime access to all future quote and feature additions.",
+          "boughtCardDescription": "Enjoy hearing even more of your favorite characters on Sounds of the Office."
+        }
+      }
+    },
+    "distributionCountries": [
+      "US"
+    ],
+    "pricing": {
+      "amazon.com": {
+        "releaseDate": "2019-03-19T00:00Z",
+        "defaultPriceListing": {
+          "price": 1.99,
+          "currency": "USD"
+        }
+      }
+    },
+    "taxInformation": {
+      "category": "SOFTWARE"
+    }
+  },
+  "privacyAndCompliance": {
+    "locales": {
+      "en-US": {
+        "privacyPolicyUrl": "https://miraclebob.com"
+      }
+    }
+  },
+  "testingInstructions": "Ask Alexa for bonus content.",
+  "purchasableState": "PURCHASABLE"
+}
