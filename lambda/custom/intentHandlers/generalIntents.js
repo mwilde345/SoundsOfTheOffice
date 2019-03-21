@@ -30,10 +30,10 @@ const HelpIntent = {
     return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-    const newGame = !(sessionAttributes.questions);
-    return GeneralHelpers.helpTheUser(newGame, handlerInput);
+    return handlerInput.responseBuilder
+      .speak('Say "main menu" to start over. You can also say "get bonus quotes" or "play some quotes".')
+      .reprompt('Are you still there? Say "more quotes" to keep listening to your favorite office characters.')
+      .getResponse();
   },
 };
 

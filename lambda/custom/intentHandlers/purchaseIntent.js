@@ -56,7 +56,7 @@ const BuyResponseHandler = {
         switch (handlerInput.requestEnvelope.request.payload.purchaseResult) {
           case 'ACCEPTED':
             speechOutput.say(
-              `You have unlocked the ${product[0].name}.  Let's listen to some of the bonus quotes.`,
+              `You have unlocked the ${product[0].name}.  I'll shuffle them in with the free quotes. Let's hear some!`,
             );
             return MultiQuoteHelpers
               .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
@@ -71,7 +71,7 @@ const BuyResponseHandler = {
             repromptOutput = 'Are you still there? Say "more quotes" to listen to some more free quotes.';
             break;
           case 'ALREADY_PURCHASED':
-            speakOutput = 'Let\'s listen to some of the bonus quotes.';
+            speakOutput = 'I\'ll shuffle the bonus quotes in with the free ones. Let\'s hear some!';
             return MultiQuoteHelpers
               .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
           default:
