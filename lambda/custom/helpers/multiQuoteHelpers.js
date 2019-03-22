@@ -78,8 +78,9 @@ function handlePlural(wordBase, number) {
   }
 }
 
-function handleUpsell(handlerInput, productId, upsellMessage) {
+function handleUpsell(handlerInput, productId, speechOutput, upsellMessage) {
   return handlerInput.responseBuilder
+    .speak(speechOutput)
     .addDirective({
       type: 'Connections.SendRequest',
       name: 'Upsell',
@@ -94,8 +95,13 @@ function handleUpsell(handlerInput, productId, upsellMessage) {
     .getResponse();
 }
 
+function getRandomCharacter(characters) {
+  return characters[Math.floor(Math.random() * characters.length)];
+}
 
-function getRandomQuotes(handlerInput, numClips, speechOutput) {
+
+function getRandomQuotes(handlerInput, numClips, speech) {
+  let speechOutput = speech;
   // TODO: add haveHeardMenu to attributes. So after each chunk of quotes we don't annoy them
   // TODO: add givenCharacterName to sessionAttributes to preserve it
   //  when hitting YES and STOP intents
@@ -110,9 +116,11 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
     isPaid, paidClipCount, freeClipCount, clipsPerCharacter, cache, productId,
   } = sessionAttributes;
   let listenedToAll = false;
-  const characterName = handlerInput.requestEnvelope.request.intent.slots
+  const characterName = handlerInput.requestEnvelope.request.type === 'IntentRequest'
+    && handlerInput.requestEnvelope.request.intent.slots
     && handlerInput.requestEnvelope.request.intent.slots.characterName
-    ? handlerInput.requestEnvelope.request.intent.slots.characterName.value : null;
+    && handlerInput.requestEnvelope.request.intent.slots.characterName.value
+    ? handlerInput.requestEnvelope.request.intent.slots.characterName.value.toLowerCase() : null;
   // if they invoke this intent from welcome screen, it means they may
   // not know how to invoke it directly. But if they come from the Menu screen,
   // they still may not know because they may have come from the game screen.
@@ -132,14 +140,18 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
       .pause('1s');
   }
 
-  const newCache = sessionAttributes.isPaid ? cache[Constants.BUCKET_NAME_FREE]
+  const newCache = isPaid ? cache[Constants.BUCKET_NAME_FREE]
     .concat(cache[Constants.BUCKET_NAME_PAID])
     : cache[Constants.BUCKET_NAME_FREE];
   let paidClipsForCharacterCount = 0;
   const allowedClips = sessionAttributes.clips
     .filter(clip => (isPaid ? true : clip.s3bucket === Constants.BUCKET_NAME_FREE));
+  console.log(`allowed clips: ${JSON.stringify(allowedClips)}`);
+  const availableCharacters = Array
+    .from(new Set(sessionAttributes.clips.map(el => el.characterName)));
   let filteredClips = filterClipsByCharacter(allowedClips, characterName, isPaid);
   let maximumViableClips = Math.min(filteredClips.length, numClips);
+  let foundClipsForCharacter = true;
   if (!filteredClips.length) {
     if (!sessionAttributes.clips.length) {
       speechOutput.say('Sorry, I don\'t have any quotes I can play for you.');
@@ -150,19 +162,28 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
         speechOutput.say('Thank you for purchasing the premium pack, I\'m sorry that I don\'t have any quotes right now.'
         + 'There must be a mistake. I\'ll fix it soon!');
       }
-      return speechOutput;
+      speechOutput = speechOutput.ssml();
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(requestAttributes.t('MULTI_QUOTE_REPROMPT'))
+        .getResponse();
     }
     if (characterName) {
       paidClipsForCharacterCount = clipsPerCharacter[Constants.BUCKET_NAME_PAID][characterName]
-        .length;
-      speechOutput.say(`Oops! That's embarrassing. I actually don't have any quotes from ${characterName}.`);
+        ? clipsPerCharacter[Constants.BUCKET_NAME_PAID][characterName].length : 0;
+      // TODO: emit a metric to see what character people ask for but can't get.
+      const unavailableMessage = paidClipsForCharacterCount ? 'Oh no! You actually don\'t have access to any quotes from '
+        + `${characterName}.` : `Oops! That's embarrassing. I actually don't have any quotes from ${characterName}. `
+          + 'I\'ll work on adding some as soon as possible!';
+      speechOutput.say(unavailableMessage);
       if (!isPaid && paidClipsForCharacterCount) {
         speechOutput.say(`However, I have ${paidClipsForCharacterCount} `
         + `${handlePlural('quote', paidClipsForCharacterCount)} from ${characterName} in the bonus `
         + 'quotes pack. Say "get bonus quotes" to learn more.');
       }
-      speechOutput.say('In the meantime, here are some quotes from random characters: ');
-      filteredClips = sessionAttributes.clips;
+      foundClipsForCharacter = false;
+      speechOutput.say('In the meantime, here are some quotes from other random characters: ');
+      filteredClips = allowedClips;
       maximumViableClips = Math.min(filteredClips.length, numClips);
     }
   } else if (maximumViableClips < numClips) {
@@ -180,7 +201,7 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
   }
   const filteredCache = filterCacheByCharacter(filteredClips, newCache, characterName);
   let canPlay = filteredClips.filter(clip => (!filteredCache.includes(clip.clipID)));
-  if (allowedClips.length === newCache.length + canPlay.length) {
+  if (allowedClips.length === newCache.length + Math.min(maximumViableClips, canPlay.length)) {
     console.log('listened to all the quotes');
     listenedToAll = true;
   }
@@ -200,11 +221,13 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
     // if they provide a character alias, don't prefix every clip with a blip about who says it.
     speechOutput
       .say(
-        characterName ? '' : Constants.getRandomIntro(clip.characterName),
+        characterName && foundClipsForCharacter ? '' : Constants.getRandomIntro(clip.characterName),
       )
       .audio(getS3Link(clip))
       .pause('200ms');
   });
+  sessionAttributes.cache = insertToCache(sessionAttributes.cache, canPlay);
+  handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
   speechOutput.say(Constants.generateQuoteEnding());
   if (listenedToAll) {
@@ -212,23 +235,27 @@ function getRandomQuotes(handlerInput, numClips, speechOutput) {
       speechOutput.say(`Nice job! You've listend to all ${freeClipCount} free quotes, and all ${paidClipCount} bonus quotes.`
         + 'Check back soon for brand new quotes that will be added! I\'ll go ahead and reshuffle them. Wanna keep going?');
     } else {
-      speechOutput.say(`Nice job! You've listened to all ${freeClipCount} free quotes. Did you know there are ${paidClipCount} `
-        + 'more bonus quotes you can get? Don\'t miss out on hearing more of your favorite characters! Want to learn more?');
-      return handleUpsell(handlerInput, productId, speechOutput.ssml());
+      const upsellMessage = `Nice job! You've listened to all ${freeClipCount} free quotes. Did you know there are ${paidClipCount} `
+      + 'more bonus quotes you can get? Don\'t miss out on hearing more of your favorite characters! Want to learn more?';
+      speechOutput = speechOutput.ssml();
+      return handleUpsell(handlerInput, productId, speechOutput, upsellMessage);
     }
   } else {
     speechOutput.say(requestAttributes.t('MULTI_QUOTE_ENDING'));
   }
   if (!sessionAttributes.haveHeardMenu) {
     speechOutput.say('Say: "yes", to hear random quotes.');
-    speechOutput.say(`You can also say: "more from ${characterName
-      || Constants.getRandomCharacter()}"`);
+    speechOutput.say(`You can also say: "more from ${characterName && foundClipsForCharacter ? characterName
+      : getRandomCharacter(availableCharacters)}"`);
     sessionAttributes.haveHeardMenu = true;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
   }
-  sessionAttributes.cache = insertToCache(sessionAttributes.cache, canPlay);
-  // sessionAttributes.cache = sessionAttributes.cache.concat(canPlay.map(clip => clip.clipID));
-  handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-  return speechOutput;
+
+  speechOutput = speechOutput.ssml();
+  return handlerInput.responseBuilder
+    .speak(speechOutput)
+    .reprompt(requestAttributes.t('MULTI_QUOTE_REPROMPT'))
+    .getResponse();
 }
 
 // console.log(getRandomQuotes(mockAttributes, Constants.MULTI_QUOTE_COUNT));

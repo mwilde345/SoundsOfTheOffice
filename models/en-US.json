@@ -23,52 +23,6 @@
                   "samples": []
               },
               {
-                  "name": "AnswerIntent",
-                  "slots": [
-                      {
-                          "name": "characterName",
-                          "type": "CHARACTER"
-                      }
-                  ],
-                  "samples": [
-                      "the answer is {characterName}",
-                      "my answer is {characterName}",
-                      "is it {characterName}",
-                      "{characterName} is my answer",
-                      "that was {characterName}",
-                      "{characterName}"
-                  ]
-              },
-              {
-                  "name": "DontKnowIntent",
-                  "slots": [],
-                  "samples": [
-                      "i don't know",
-                      "don't know",
-                      "i don't know that one",
-                      "dunno",
-                      "skip",
-                      "i don't know that",
-                      "who knows",
-                      "i don't know this question"
-                  ]
-              },
-              {
-                  "name": "AMAZON.StartOverIntent",
-                  "samples": [
-                      "start over"
-                  ]
-              },
-              {
-                "name": "GameIntent",
-                "samples": [
-                  "new game",
-                  "play game",
-                  "start a game",
-                  "i want to play a game"
-                ]
-              },
-              {
                 "name": "MenuIntent",
                 "samples": [
                   "main menu",
@@ -76,10 +30,6 @@
                   "menu",
                   "go to the menu"
                 ]
-              },
-              {
-                  "name": "AMAZON.RepeatIntent",
-                  "samples": []
               },
               {
                   "name": "AMAZON.YesIntent",
@@ -101,27 +51,6 @@
                   "samples": []
               },
               {
-                  "name": "AMAZON.NavigateHomeIntent",
-                  "samples": []
-              },
-              {
-                  "name": "SingleQuoteIntent",
-                  "slots": [
-                      {
-                          "name": "characterName",
-                          "type": "CHARACTER"
-                      }
-                  ],
-                  "samples": [
-                      "play a quote by {characterName}",
-                      "get a quote from {characterName}",
-                      "get a quote",
-                      "play a quote",
-                      "get me a quote",
-                      "quote from {characterName}"
-                  ]
-              },
-              {
                 "name": "PurchaseIntent",
                 "samples": [
                     "get bonus quotes",
@@ -132,7 +61,22 @@
                     "download more quotes",
                     "buy bonus quotes",
                     "buy premium version",
-                    "get premium"
+                    "get premium",
+                    "ask sounds of the office for bonus quotes"
+                ]
+              },
+              {
+                "name": "PurchaseHistoryIntent",
+                "samples": [
+                    "what did i buy",
+                    "what do i own",
+                    "list products",
+                    "what products do i have",
+                    "have i bought anything",
+                    "did i buy something",
+                    "list purchases",
+                    "do i have bonus content",
+                    "do i have premium"
                 ]
               },
               {
@@ -189,7 +133,12 @@
                     "more quotes",
                     "more",
                     "few quotes from {characterName}",
-                    "random quotes"
+                    "random quotes",
+                    "ask sounds of the office for quotes from {characterName}",
+                    "get a quote",
+                    "play a quote",
+                    "play a quote from {characterName}",
+                    "get a quote from {characterName}"
                 ]
               }
           ],

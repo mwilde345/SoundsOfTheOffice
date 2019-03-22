@@ -12,39 +12,35 @@ function getSpeakableListOfProducts(entitleProductsList) {
 }
 
 
-const PurchaseOptionsIntent = {
+const PurchaseHistoryIntent = {
   canHandle(handlerInput) {
     const { request } = handlerInput.requestEnvelope;
 
-    return request.type === 'IntentRequest' && request.intent.name === 'PurchaseOptionsIntent';
+    return request.type === 'IntentRequest' && request.intent.name === 'PurchaseHistoryIntent';
   },
   handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     let speakOutput;
     let repromptOutput;
     const { locale } = handlerInput.requestEnvelope.request;
     const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
 
     return ms.getInSkillProducts(locale).then((result) => {
+      const ownedProducts = result.inSkillProducts.filter(record => record.entitled === 'ENTITLED');
       const purchasableProducts = result.inSkillProducts.filter(record => record.entitled === 'NOT_ENTITLED' && record.purchasable === 'PURCHASABLE');
-      if (purchasableProducts.length > 0) {
-        speakOutput = `Products available for purchase at this time are ${getSpeakableListOfProducts(purchasableProducts)}`
+      if (ownedProducts.length === 0) {
+        speakOutput = 'Looks like you haven\'t bought anything from this skill. ';
+        if (purchasableProducts.length > 0) {
+          speakOutput += `There is a product available for purchase at this time called ${getSpeakableListOfProducts(purchasableProducts)}`
           + '. To learn more about the product, say \'Tell me more about Bonus Content\'. '
-          + ' If you are ready to buy say \'Buy Bonus Content\'. So what can I help you with?';
-        repromptOutput = 'I didn\'t catch that. What can I help you with?';
-
-        return handlerInput.responseBuilder
-          .speak(speakOutput)
-          .reprompt(repromptOutput)
-          .getResponse();
+          + ' If you are ready to buy say \'Buy Bonus Content\'. You can also just say \'Play more quotes\'. So what can I help you with?';
+        } else {
+          speakOutput += 'Do you want to hear more quotes? ';
+        }
+      } else {
+        speakOutput = `You have purchased ${ownedProducts[0].name}. If you'd like a refund, say "return ${ownedProducts[0].name}". `
+          + 'You can also say "play more quotes" to continue.';
       }
-      // no products!
-      console.log('!!! ALERT !!!  The product list came back as empty.  This could be due to no ISPs being created and linked to the skill, the ISPs being created '
-        + ' incorrectly, the locale not supporting ISPs, or the customer\'s account being from an unsupported marketplace.');
-      speakOutput = 'I\'ve checked high and low, however I can\'t find any products to offer to you right now.  Sorry about that.  '
-        + 'I can\'t guarantee it, but I might be able to find something later.  Would you like a random quote now instead?';
       repromptOutput = 'I didn\'t catch that. What can I help you with?';
-
       return handlerInput.responseBuilder
         .speak(speakOutput)
         .reprompt(repromptOutput)
@@ -54,5 +50,5 @@ const PurchaseOptionsIntent = {
 };
 
 module.exports = {
-  PurchaseOptionsIntent,
+  PurchaseHistoryIntent,
 };

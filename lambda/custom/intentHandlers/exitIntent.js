@@ -8,16 +8,20 @@ const ExitIntent = {
 
     return request.type === 'IntentRequest' && request.intent.name === 'ExitIntent';
   },
-  async handle(handlerInput) {
+  handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const { speech } = requestAttributes;
     const userID = handlerInput.requestEnvelope.context.System.user.userId;
     const { cache } = sessionAttributes;
-    return ExitHelpers.updateCache(userID, cache)
-      .then(() => handlerInput.responseBuilder
-        .speak(requestAttributes.t('EXIT_MESSAGE'))
-        .withShouldEndSession(true)
-        .getResponse());
+    ExitHelpers.updateCache(userID, cache);
+    speech
+      .audio(`${Constants.S3_URL}${Constants.BUCKET_NAME_CONTENT}/outro.mp3`)
+      .say(requestAttributes.t('EXIT_MESSAGE'));
+    return handlerInput.responseBuilder
+      .speak(speech.ssml())
+      .withShouldEndSession(true)
+      .getResponse();
   },
 };
 

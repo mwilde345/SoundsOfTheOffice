@@ -6,11 +6,11 @@
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "d016c9426973b508d0f3a58a6c6834a9"
+          "eTag": "c5ebe71072370af69cdfe3259b85611e"
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "e1096db3f889a452e35f9a748b8266bd"
+            "eTag": "6435e123d7eb63cde123679eeab56fe7"
           }
         },
         "lambda": [
@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-sounds-of-the-office-default",
             "handler": "index.handler",
-            "revisionId": "59098911-6b85-4085-a30d-f2780036aecb",
+            "revisionId": "360adc6d-0b22-42c7-b795-7907f55e5ca4",
             "runtime": "nodejs8.10"
           }
         ]

@@ -46,6 +46,7 @@ const BuyResponseHandler = {
     const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
     const { productId } = handlerInput.requestEnvelope.request.payload;
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const speechOutput = requestAttributes.speech;
     return ms.getInSkillProducts(locale).then((result) => {
       const product = result.inSkillProducts.filter(record => record.productId === productId);
@@ -53,13 +54,18 @@ const BuyResponseHandler = {
       if (handlerInput.requestEnvelope.request.status.code === '200') {
         let speakOutput;
         let repromptOutput;
+        sessionAttributes.intentOfRequest = 'PurchaseIntent';
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         switch (handlerInput.requestEnvelope.request.payload.purchaseResult) {
           case 'ACCEPTED':
             speechOutput.say(
-              `You have unlocked the ${product[0].name}.  I'll shuffle them in with the free quotes. Let's hear some!`,
+              `You have unlocked the ${product[0].name}.  I'll shuffle them in with the free quotes. Do you want to hear some more quotes?`,
             );
-            return MultiQuoteHelpers
-              .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
+            speakOutput = `You have unlocked the ${product[0].name}.  I'll shuffle them in with the free quotes. Do you want to hear some more quotes?`;
+            repromptOutput = 'Say "more quotes" to hear more. Say "quit" to exit.';
+            break;
+            // return MultiQuoteHelpers
+            //   .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
           case 'DECLINED':
             if (handlerInput.requestEnvelope.request.name === 'Buy') {
               // response when declined buy request
@@ -68,13 +74,17 @@ const BuyResponseHandler = {
               break;
             }
             // response when declined upsell request
-            speakOutput = 'OK. Do you want to hear some more free quotes?';
+            speakOutput = 'Do you want to hear some more free quotes?';
             repromptOutput = 'Are you still there? Say "more quotes" to listen to some more free quotes.';
             break;
           case 'ALREADY_PURCHASED':
-            speechOutput.say('I\'m shuffling the bonus quotes in with the free ones. Let\'s hear some!');
-            return MultiQuoteHelpers
-              .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
+            speakOutput = 'I\'ll go ahead and shuffle the bonus quotes in with the free ones. Would you like to hear more quotes?';
+            repromptOutput = 'Say "more quotes" to hear more. Say "quit" to exit.';
+            break;
+            // speechOutput.say('I\'m shuffling the bonus quotes in with the free ones.'
+            // + 'Let\'s hear some!');
+            // return MultiQuoteHelpers
+            //   .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
           default:
             console.log(`unhandled purchaseResult: ${handlerInput.requestEnvelope.payload.purchaseResult}`);
             speakOutput = `Something unexpected happened, but thanks for your interest in the ${product[0].name}.  Would you like to hear more free quotes?`;

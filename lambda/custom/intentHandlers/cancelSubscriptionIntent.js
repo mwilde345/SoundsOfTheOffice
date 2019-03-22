@@ -10,39 +10,32 @@ const CancelSubscriptionIntent = {
   },
   handle(handlerInput) {
     console.log('IN: CancelSubscriptionHandler.handle');
-
-    const { locale } = handlerInput.requestEnvelope.request;
-    const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
-
-    return ms.getInSkillProducts(locale).then((result) => {
-      const product = result.inSkillProducts
-        .filter(record => record.referenceName === 'Premium_Content');
-
-      if (product.length > 0) {
-        return handlerInput.responseBuilder
-          .addDirective({
-            type: 'Connections.SendRequest',
-            name: 'Cancel',
-            payload: {
-              InSkillProduct: {
-                productId: product[0].productId,
-              },
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    if (sessionAttributes.productId) {
+      return handlerInput.responseBuilder
+        .addDirective({
+          type: 'Connections.SendRequest',
+          name: 'Cancel',
+          payload: {
+            InSkillProduct: {
+              productId: sessionAttributes.productId,
             },
-            token: 'correlationToken',
-          })
-          .getResponse();
-      }
+          },
+          token: 'correlationToken',
+        })
+        .getResponse();
+    }
 
-      // requested product didn't match something from the catalog
-      console.log('!!! ALERT !!!  The requested product **Premium Content** could not be found.  This could be due to no ISPs being created and linked to the skill, the ISPs being created '
+    // requested product didn't match something from the catalog
+    console.log('!!! ALERT !!!  The requested product **Premium Content** could not be found.  This could be due to no ISPs being created and linked to the skill, the ISPs being created '
         + ' incorrectly, the locale not supporting ISPs, or the customer\'s account being from an unsupported marketplace.');
 
-      return handlerInput.responseBuilder
-        .speak('I don\'t think we have a product by that name.  Can you try again?')
-        .reprompt('I didn\'t catch that. Can you try again?')
-        .getResponse();
-    });
+    return handlerInput.responseBuilder
+      .speak('I don\'t think we have a product by that name.  Can you try again?')
+      .reprompt('I didn\'t catch that. Can you try again?')
+      .getResponse();
   },
+
 };
 
 // THIS HANDLES THE CONNECTIONS.RESPONSE EVENT AFTER A CANCEL OCCURS.
@@ -59,17 +52,22 @@ const CancelResponseHandler = {
     const { productId } = handlerInput.requestEnvelope.request.payload;
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const speechOutput = requestAttributes.speech;
-
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes.intentOfRequest = 'CancelSubscriptionIntent';
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     return ms.getInSkillProducts(locale).then((result) => {
-      const product = result.inSkillProducts.filter(record => record.productId === productId);
+      let product = result.inSkillProducts.filter(record => record.productId === productId);
+      if (product.length) {
+        [product] = product;
+      }
       console.log(`PRODUCT = ${JSON.stringify(product)}`);
       if (handlerInput.requestEnvelope.request.status.code === '200') {
         if (handlerInput.requestEnvelope.request.payload.purchaseResult === 'ACCEPTED') {
-          speechOutput.say(`You have successfully refunded your purchase of ${product.name}.`
-            + 'Let\'s listen to some awesome free quotes now.');
-
-          return MultiQuoteHelpers
-            .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
+          return handlerInput.responseBuilder
+            .speak(`You have successfully refunded your purchase of ${product.name}. `
+            + 'Do you want to listen to some more quotes now?')
+            .reprompt('Your purchase was refunded. Say quotes to hear some more quotes.')
+            .getResponse();
         }
         if (handlerInput.requestEnvelope.request.payload.purchaseResult === 'NOT_ENTITLED') {
           speechOutput.say('You don\'t currently have any products to refund. Let\'s get back to the office.');

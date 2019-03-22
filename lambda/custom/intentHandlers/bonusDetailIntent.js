@@ -20,8 +20,8 @@ const BonusDetailIntent = {
       const product = result.inSkillProducts;
 
       if (isProduct(product)) {
-        const speakOutput = `${product[0].summary}. To buy it, say Buy ${product[0].name}. `;
-        const repromptOutput = `I didn't catch that. To buy ${product[0].name}, say Buy ${product[0].name}. `;
+        const speakOutput = `${product[0].summary} To buy it, say Buy ${product[0].name}. You can also say: "play more quotes".`;
+        const repromptOutput = `I didn't catch that. To buy ${product[0].name}, say Buy ${product[0].name}. Or say: "play quotes" to hear some more quotes.`;
         return handlerInput.responseBuilder
           .speak(speakOutput)
           .reprompt(repromptOutput)

@@ -8,31 +8,27 @@ const AmazonSpeech = require('ssml-builder/amazon_speech');
 const async = require('async');
 const Constants = require('./common/constants');
 const WelcomeHelpers = require('./helpers/welcomeHelpers');
+const ExitHelpers = require('./helpers/exitHelpers');
 
 const {
   LaunchRequest,
   HelpIntent,
   UnhandledIntent,
   SessionEndedRequest,
-  AnswerIntent,
-  RepeatIntent,
   YesIntent,
   StopIntent,
   CancelIntent,
   NoIntent,
 } = require('./intentHandlers/generalIntents');
-const { SingleQuoteIntent } = require('./intentHandlers/singleQuoteIntent');
 const { MultiQuoteIntent } = require('./intentHandlers/multiQuoteIntent');
 const { PurchaseIntent, BuyResponseHandler } = require('./intentHandlers/purchaseIntent');
 const { BonusDetailIntent } = require('./intentHandlers/bonusDetailIntent');
 const { PurchaseOptionsIntent } = require('./intentHandlers/purchaseOptionsIntent');
+const { CancelSubscriptionIntent, CancelResponseHandler } = require('./intentHandlers/cancelSubscriptionIntent');
 const { MenuIntent } = require('./intentHandlers/menuIntent');
 const { WelcomeIntent } = require('./intentHandlers/welcomeIntent');
 const { ExitIntent } = require('./intentHandlers/exitIntent');
-const { GameIntent } = require('./intentHandlers/gameIntent');
-
-const DynamoClient = require('./clients/dynamoClient').init(AWS);
-const S3Client = require('./clients/s3Client').init(AWS);
+const { PurchaseHistoryIntent } = require('./intentHandlers/purchaseHistoryIntent');
 
 const ErrorHandler = {
   canHandle() {
@@ -84,7 +80,6 @@ const InitializationInterceptor = {
     console.log(JSON.stringify(handlerInput));
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
     handlerInput.attributesManager
       .setRequestAttributes(Object.assign(requestAttributes, { speech: new AmazonSpeech() }));
 
@@ -95,21 +90,24 @@ const InitializationInterceptor = {
           Object.assign(sessionAttributes, clipsAndCache);
           const { clips } = clipsAndCache;
           const clipsPerCharacter = {
-            [Constants.BUCKET_NAME_FREE]: [],
-            [Constants.BUCKET_NAME_PAID]: [],
+            [Constants.BUCKET_NAME_FREE]: {},
+            [Constants.BUCKET_NAME_PAID]: {},
           };
           const paidClipCount = clips
             .filter(clip => clip.s3bucket === Constants.BUCKET_NAME_PAID).length;
           const freeClipCount = clips
             .filter(clip => clip.s3bucket === Constants.BUCKET_NAME_FREE).length;
           clips.map(({ clipID, characterName, s3bucket }) => {
-            if (!clipsPerCharacter[s3bucket][characterName]) {
-              clipsPerCharacter[s3bucket][characterName] = [clipID];
+            const character = characterName.toLowerCase();
+            if (!clipsPerCharacter[s3bucket][character]) {
+              console.log(`putting in clips: ${JSON.stringify({ clipID, character, s3bucket })}`);
+              clipsPerCharacter[s3bucket][character] = [clipID];
             } else {
-              clipsPerCharacter[s3bucket][characterName].push(clipID);
+              clipsPerCharacter[s3bucket][character].push(clipID);
             }
           });
           Object.assign(sessionAttributes, { clipsPerCharacter, paidClipCount, freeClipCount });
+          console.log(`session attributes after: ${JSON.stringify(sessionAttributes)}`);
           handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         });
     }
@@ -119,12 +117,17 @@ const InitializationInterceptor = {
 const ResponseInterceptor = {
   process(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const userID = handlerInput.requestEnvelope.context.System.user.userId;
+    const { cache } = sessionAttributes;
     const { request } = handlerInput.requestEnvelope;
     if (request.type === 'IntentRequest'
     && !Constants.DEFAULT_INTENTS.includes(request.intent.name)) {
       Object.assign(sessionAttributes, { intentOfRequest: request.intent.name });
       handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     }
+    // don't do await, would cause delay
+    // TODO, only update the cache on exit and when passing off to a payment intent
+    ExitHelpers.updateCache(userID, cache);
   },
 };
 
@@ -162,23 +165,22 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequest,
     HelpIntent,
-    AnswerIntent,
-    RepeatIntent,
     YesIntent,
     StopIntent,
     CancelIntent,
     NoIntent,
     SessionEndedRequest,
-    SingleQuoteIntent,
     MultiQuoteIntent,
     PurchaseIntent,
     PurchaseOptionsIntent,
+    PurchaseHistoryIntent,
+    CancelSubscriptionIntent,
+    CancelResponseHandler,
     BonusDetailIntent,
     BuyResponseHandler,
     MenuIntent,
     WelcomeIntent,
     ExitIntent,
-    GameIntent,
     FallbackHandler,
     UnhandledIntent,
   )

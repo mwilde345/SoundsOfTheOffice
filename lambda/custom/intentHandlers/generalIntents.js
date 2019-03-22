@@ -42,21 +42,8 @@ const UnhandledIntent = {
     return true;
   },
   handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-    if (Object.keys(sessionAttributes).length === 0) {
-      const speechOutput = requestAttributes.t('START_UNHANDLED');
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .reprompt(speechOutput)
-        .getResponse();
-    } if (sessionAttributes.questions) {
-      const speechOutput = requestAttributes.t('TRIVIA_UNHANDLED', Constants.ANSWER_COUNT.toString());
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .reprompt(speechOutput)
-        .getResponse();
-    }
+    // TODO: check where they are. playing quotes, menu, etc.
     const speechOutput = requestAttributes.t('HELP_UNHANDLED');
     return handlerInput.responseBuilder.speak(speechOutput).reprompt(speechOutput).getResponse();
   },
@@ -100,6 +87,8 @@ const YesIntent = {
     switch (sessionAttributes.intentOfRequest) {
       case 'MultiQuoteIntent':
       case 'PurchaseIntent':
+      case 'CancelSubscriptionIntent':
+      case 'PurchaseHistoryIntent':
         return MultiQuoteIntent.handle(handlerInput);
       case 'GameIntent':
         return GameIntent.handle(handlerInput);
@@ -119,6 +108,9 @@ const StopIntent = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const { intentOfRequest } = sessionAttributes;
+    sessionAttributes.intentOfRequest = 'AMAZON.StopIntent';
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
     if (intentOfRequest === 'MultiQuoteIntent' || intentOfRequest === 'GameIntent') {
       const speechOutput = requestAttributes.t('STOP_MESSAGE');
       return handlerInput.responseBuilder.speak(speechOutput)
@@ -158,10 +150,11 @@ const SessionEndedRequest = {
     return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
   },
   handle(handlerInput) {
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
     // return ExitIntent.handle(handlerInput);
     return handlerInput.responseBuilder
-      .speak('Session is over')
+      .speak(requestAttributes.t('EXIT_MESSAGE'))
       .withShouldEndSession(true)
       .getResponse();
   },

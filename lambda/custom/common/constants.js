@@ -12,11 +12,11 @@ function generateQuoteEnding() {
 const LANGUAGE_STRING = {
   en: {
     translation: {
-      WELCOME_MESSAGE_FREE: 'Welcome to Sounds of the Office',
-      WELCOME_MESSAGE_PREMIUM: 'Welcome to Sounds of the Office: Premium Version',
+      WELCOME_MESSAGE_FREE: 'Welcome to Sounds of the Office.',
+      WELCOME_MESSAGE_PREMIUM: 'Welcome to Sounds of the Office: Premium Version.',
       MENU_MESSAGE_PREMIUM: 'You have access to all premium quotes. Say: "Play Quotes" to get started!',
-      MENU_MESSAGE_FREE: 'Say: "Play Quotes" to get started. To get tons of bonus quotes, say: "bonus quotes".',
-      MENU_REPROMPT: 'Are you still there? You can say: "Play some quotes." Say "help" for more help. Say "exit" to leave the office.',
+      MENU_MESSAGE_FREE: 'To get started say: "Play Quotes". To get lots of bonus quotes, say: "bonus quotes".',
+      MENU_REPROMPT: 'Are you still there? You can say: "Play some quotes". Say "help" for more help. Say "exit" to leave the office.',
       START_QUOTE_MESSAGE: 'Next time you can skip the menu by saying: ',
       MULTI_SUGGESTION: 'Ask Sounds of the Office to play a few quotes %s',
       MULTI_QUOTE_ENDING: 'Would you like to hear more?',
@@ -24,7 +24,7 @@ const LANGUAGE_STRING = {
       SINGLE_SUGGESTION: 'Ask Sounds of the Office to play a quote %s',
       EXIT_MESSAGE: 'Thanks for dropping in. Goodbye!',
       CANCEL_MESSAGE: 'Thanks for dropping in. Goodbye!',
-      STOP_MESSAGE: 'What would you like to do? Say "continue", "main menu", or "quit".',
+      STOP_MESSAGE: 'What would you like to do? Say "continue", "main menu", or "stop".',
       NO_MESSAGE: 'Thanks for dropping in. Goodbye!',
 
       GAME_NAME: 'Reindeer Trivia',
@@ -33,7 +33,7 @@ const LANGUAGE_STRING = {
       ASK_MESSAGE_START: 'Would you like to start playing?',
       HELP_REPROMPT: 'To give an answer to a question, respond with the number of the answer. ',
       TRIVIA_UNHANDLED: 'Try saying a number between 1 and %s',
-      HELP_UNHANDLED: 'Say yes to continue, or no to end the game.',
+      HELP_UNHANDLED: 'Say quotes to hear quotes. Say menu to start over. Say exit to leave.',
       START_UNHANDLED: 'Say start to start a new game.',
       NEW_GAME_MESSAGE: 'Welcome to %s. ',
       ANSWER_CORRECT_MESSAGE: 'correct. ',
@@ -83,7 +83,7 @@ function getRandomIntroGivenCharacter(character) {
   ];
   return INTRO_STRINGS[Math.floor(Math.random() * INTRO_STRINGS.length)];
 }
-
+// unused for now because we want to suggest what people they can actually listen to
 function getRandomCharacter() {
   const CHARACTERS = [
     'dwight',
@@ -115,7 +115,7 @@ function getRandomCharacter() {
     'deangelo',
     'josh',
     'kat',
-    'sa',
+    'sam',
     'clark',
   ];
   return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];

@@ -21,14 +21,9 @@ const MultiQuoteIntent = {
     // TODO: only do the suggestion message if coming from the menu. directly invoking should
     // not have that.
     // TODO: for the suggestion, use the character name if they specify it.
-    let speechOutput = requestAttributes.speech;
-    speechOutput = MultiQuoteHelpers
+    const speechOutput = requestAttributes.speech;
+    return MultiQuoteHelpers
       .getRandomQuotes(handlerInput, Constants.MULTI_QUOTE_COUNT, speechOutput);
-    speechOutput = speechOutput.ssml();
-    return handlerInput.responseBuilder
-      .speak(speechOutput)
-      .reprompt(requestAttributes.t('MULTI_QUOTE_REPROMPT'))
-      .getResponse();
   },
 };
 

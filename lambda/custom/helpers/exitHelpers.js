@@ -5,7 +5,7 @@ const DynamoClient = require('../clients/dynamoClient').init(AWS);
 
 
 function updateCache(userID, cache) {
-  return DynamoClient.updateCache(userID, cache);
+  DynamoClient.updateCache(userID, cache);
 }
 
 module.exports = {
