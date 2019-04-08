@@ -6,7 +6,7 @@
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "c5ebe71072370af69cdfe3259b85611e"
+          "eTag": "d0c95294726aa74c1d77dab8f183149f"
         },
         "interactionModel": {
           "en-US": {
@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-sounds-of-the-office-default",
             "handler": "index.handler",
-            "revisionId": "360adc6d-0b22-42c7-b795-7907f55e5ca4",
+            "revisionId": "ea693fcd-45e7-4289-b783-83a2ee0cf026",
             "runtime": "nodejs8.10"
           }
         ]

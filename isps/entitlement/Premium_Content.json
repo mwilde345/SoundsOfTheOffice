@@ -8,8 +8,8 @@
         "name": "Bonus Content",
         "summary": "Get access to a lot more quotes, and cool features that are coming out!",
         "description": "This add-on provides you access to at a continually growing list of more quotes from your favorite office characters. You will also get access to new features that will be released, like voting on quotes and playing \"Guess the Character\". What are you waiting for?!",
-        "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/c6a4/aaa3eaaac8ac43f6bb161e47342ba984/APP_ICON?versionId=viNfyDifslLE_ZkseIIvJkmPho5Ntfzu&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1553359086&Signature=aA0Xn4aA2Uem6dLB0XYMUHsLmqI%3D",
-        "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/8b93/5f3290a3438b4103900f8dfd1f8c151c/APP_ICON_LARGE?versionId=tLUbMK6b2MG2vkUzclHdYRCLyEmWnRgO&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1553359086&Signature=0hYOjGYveAKlhvdnF0m4%2Fle4Pew%3D",
+        "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/c6a4/aaa3eaaac8ac43f6bb161e47342ba984/APP_ICON?versionId=viNfyDifslLE_ZkseIIvJkmPho5Ntfzu&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1554822188&Signature=paBHn%2FIuS974jOoDgJIoauy8%2FOk%3D",
+        "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/8b93/5f3290a3438b4103900f8dfd1f8c151c/APP_ICON_LARGE?versionId=tLUbMK6b2MG2vkUzclHdYRCLyEmWnRgO&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1554822188&Signature=p3AuyYQUVF6eiwn8Ndsg9RZ5e%2Bo%3D",
         "examplePhrases": [
           "Alexa, get bonus quotes.",
           "Alexa, buy extra content.",

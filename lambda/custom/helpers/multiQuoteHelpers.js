@@ -95,10 +95,6 @@ function handleUpsell(handlerInput, productId, speechOutput, upsellMessage) {
     .getResponse();
 }
 
-function getRandomCharacter(characters) {
-  return characters[Math.floor(Math.random() * characters.length)];
-}
-
 
 function getRandomQuotes(handlerInput, numClips, speech) {
   let speechOutput = speech;
@@ -246,7 +242,7 @@ function getRandomQuotes(handlerInput, numClips, speech) {
   if (!sessionAttributes.haveHeardMenu) {
     speechOutput.say('Say: "yes", to hear random quotes.');
     speechOutput.say(`You can also say: "more from ${characterName && foundClipsForCharacter ? characterName
-      : getRandomCharacter(availableCharacters)}"`);
+      : Constants.getRandomCharacter(availableCharacters)}"`);
     sessionAttributes.haveHeardMenu = true;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
   }

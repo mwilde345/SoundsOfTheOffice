@@ -3,16 +3,16 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Hear the actual voices of your favorite Office stars!",
+          "summary": "Hear the actual voices of your favorite Office characters!",
           "examplePhrases": [
-            "Alexa, Open sounds of the office.",
+            "Alexa, Open Sounds of the Office.",
             "Alexa, Ask Sounds of the Office for quotes from Jim.",
-            "Alexa, Ask Sounds of the Office for bonus quotes."
+            "Alexa, Ask Sounds of the Office for more quotes."
           ],
-          "smallIconUri": "https://s3.amazonaws.com/soundsoftheoffice/content/app_logo_small.png",
-          "largeIconUri": "https://s3.amazonaws.com/soundsoftheoffice/content/app_logo_big.png",
-          "name": "Sounds of the Office",
-          "description": "Alexa's voice is boring! Hear the funniest quotes from the voices of the actual actors in the hit show, the Office.\n\nDwight, Jim, Michael, Creed, and the whole gang get together in this hilarious Alexa skill to remind you why Dunder Mifflin is the best place to be.\n\nThis skill comes with at least 30 free quotes to hear and tons more you can get with a one-time purchase. By purchasing the bonus quotes you get access to tons more from your favorite characters! New quotes are added for premium users regularly. Premium users also get access to all future updates coming out, like \"Vote a Quote\" and \"Guess the Character\".\nWhat are you waiting for!?",
+          "smallIconUri": "https://s3.amazonaws.com/soundsoftheoffice/content/mScottSmall.png",
+          "largeIconUri": "https://s3.amazonaws.com/soundsoftheoffice/content/mScottBig.png",
+          "name": "Real Quotes from The Office",
+          "description": "Alexa's voice is boring! Hear the funniest quotes from the voices of the actual actors in the hit show, the Office.\n\nDwight, Jim, Michael, Creed, and the whole gang get together in this hilarious Alexa skill to remind you why Dunder Mifflin is the best place to be.\n\nThis skill comes with at least 30 free quotes to hear and tons more bonus quotes. Get ready for lots of new features coming out, like \"Vote a Quote\" and \"Guess the Character\".\nWhat are you waiting for!? Give this skill a try.",
           "keywords": [
             "the office",
             "office quotes",
@@ -22,10 +22,24 @@
             "michael scott quotes",
             "michael scott",
             "funny office",
-            "sounds of office",
+            "sounds of the office",
+            "the office voices",
+            "the office quote game",
             "actor quotes",
             "nbc",
-            "comedy quotes"
+            "comedy quotes",
+            "office trivia",
+            "the office show",
+            "the office quote game",
+            "movie quotes",
+            "audio quotes",
+            "tv show",
+            "tv show quotes",
+            "quotes",
+            "office",
+            "trivia",
+            "soundboard",
+            "sounds"
           ],
           "updatesDescription": "* Improved Randomization: you will cycle through all the available quotes before hearing repeats.\n* You can ask for quotes from specific characters.\n* Improved audio quality!\n* I keep track of the most popular characters people ask for so I can focus on adding more quotes from them."
         }

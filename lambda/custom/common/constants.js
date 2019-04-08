@@ -84,7 +84,8 @@ function getRandomIntroGivenCharacter(character) {
   return INTRO_STRINGS[Math.floor(Math.random() * INTRO_STRINGS.length)];
 }
 // unused for now because we want to suggest what people they can actually listen to
-function getRandomCharacter() {
+// TODO: what if a new character name is added to the db from a clip.
+function getRandomCharacter(availableCharacters) {
   const CHARACTERS = [
     'dwight',
     'michael',
@@ -118,7 +119,13 @@ function getRandomCharacter() {
     'sam',
     'clark',
   ];
-  return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+  // TODO: characters array is source of truth for what is in the slots.
+  // how to better add new characters to DB, slots, and here?
+  let randomNum = Math.floor(Math.random() * CHARACTERS.length);
+  while (!availableCharacters.includes(CHARACTERS[randomNum])) {
+    randomNum = Math.floor(Math.random() * CHARACTERS.length);
+  }
+  return CHARACTERS[randomNum];
 }
 
 module.exports = {
